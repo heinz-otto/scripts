@@ -63,9 +63,9 @@ fi
 # Schleife ueber alle Zeilen aufsteigend. Fuer absteigend(i=${#cmdarray[*]}; i>0; i--)
 for ((i=1; i<=${#cmdarray[*]}; i++));do 
     echo "proceeding Line ${i-1}:"${cmdarray[i-1]}
-	#oder perl uri_escape verwenden
+    #oder perl uri_escape verwenden
     #cmd=$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${cmdarray[i-1]}")
-	# urlencode Schleife ueber String
+    # urlencode Schleife ueber String
     cmd=''
     for ((pos=0;pos<${#cmdarray[i-1]};pos++)); do
         c=${cmdarray[i-1]:$pos:1}
