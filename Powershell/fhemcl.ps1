@@ -44,7 +44,7 @@ if ($arr.Length -eq 4){
 # get Token
 $token = Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri "$hosturl/fhem?XHR=1" | %{$_.Headers["X-FHEM-csrfToken"]}
 
-# fhem cmd einlesen, entweder aus der Pipe, Datei oder zweiter Parameter 
+# reading commands from Pipe, File or Arguments 
 # clear cmdarray and save the Pipeline,
 # $input contains all lines from pipeline, $sec contains the last line
 $cmdarray=@()
