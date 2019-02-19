@@ -13,14 +13,14 @@
 #region Params
 param(
     [Parameter(Mandatory=$true,Position=0,HelpMessage="-first 'Portnumber or URL'")]
-    [String]$first,#="http://raspib:8083",
+    [String]$first,
     [Parameter(ValueFromPipeline=$true,ValueFromRemainingArguments=$true)]
-    [String[]]$sec #= "D:\Users\Otto\OneDrive\Dokumente\Zeile.txt"
+    [String[]]$sec
 )
 #endregion 
 
-# Wenn nur ein Element, als Portnummer verwenden
-# sonst als hosturl verwenden
+# if only one element the use as portNumber
+# or use as hosturl
 $arr = $first -split ':'
 if ($arr.Length -eq 1){
    if ($first -match '^\d+$') {$hosturl="http://localhost:$first"}
@@ -37,29 +37,25 @@ if ($arr.Length -eq 4){
      $headers = @{
      Authorization=("Basic {0}" -f $base64AuthInfo)
      }
-     
-     # Nur zum Test noch pscredential
-     $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
-     $credential = New-Object System.Management.Automation.PSCredential($username, $secpasswd)
-     
-     #hosturl vom Account befreien, stört ber ev. gar nicht
+
+     # cut the account from hosturl 
      $hosturl=$arr[0] + "://"+$($arr[2] -split '@')[1] +":" + $arr[3]
 }
-#Token holen
+# get Token
 $token = Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri "$hosturl/fhem?XHR=1" | %{$_.Headers["X-FHEM-csrfToken"]}
 
 # fhem cmd einlesen, entweder aus der Pipe, Datei oder zweiter Parameter 
-# cmdarray leeren und Pipeline retten,
-#$input contains all lines from pipeline, $sec contains the last line
+# clear cmdarray and save the Pipeline,
+# $input contains all lines from pipeline, $sec contains the last line
 $cmdarray=@()
 foreach ($cmd2 in $input){$cmdarray += $cmd2}
 if ($cmdarray.length -eq 0) {
      if((Test-Path $sec) -And ($sec.Length -eq 1)) {$cmdarray = Get-Content $sec} 
      else {foreach ($cmd2 in $sec){$cmdarray += $cmd2}}
 }
-#cmd abarbeiten
+# send all commands to FHEM
 foreach ($cmd in $cmdarray){
-# Fehler wenn mit Basic Auth und Befehle wie set Aktor01 ..  list geht.
+# there is still an error message with Basic Auth and commands like set Aktor01 ..  e.g. list is without any error.
    $web = Invoke-WebRequest -Uri "$hosturl/fhem?cmd=$cmd&fwcsrf=$token" -Headers $headers
    if ($web.content.IndexOf("<pre>") -ne -1) {$web.content.Substring($web.content.IndexOf("<pre>"),$web.content.IndexOf("</pre>")-$web.content.IndexOf("<pre>")) -replace '<[^>]+>',''}
 }
