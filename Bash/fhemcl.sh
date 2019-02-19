@@ -26,7 +26,7 @@ then
         hosturl=http://localhost:$1
 	else
 	    echo "$1 is not a Portnumber"
-		exit 1
+            exit 1
 	fi
 else
     hosturl=$1
@@ -42,24 +42,24 @@ if [ -p /dev/stdin ]; then
         echo "Data was piped to this script!"
         # If we want to read the input line by line
         while IFS= read line; do
-                echo "Pipe Line: ${line}"
-				cmdarray+=("${line}")
+              echo "Pipe Line: ${line}"
+              cmdarray+=("${line}")
         done
 else
         # Checking the 2 parameter: filename exist or simple commands
         if [ -f "$2" ]; then
                 echo "Filename specified: ${2}"
                 echo "Reading File.."
-				while IFS= read line; do
-					echo "File Line: ${line}"
-					cmdarray+=("${line}")
-				done < ${2}
+                while IFS= read line; do
+		      echo "File Line: ${line}"
+                      cmdarray+=("${line}")
+		done < ${2}
         else
-		    echo "Reading further parameters"
-		    for ((a=2; a<=${#}; a++)); do
-                echo "command specified: ${!a}"
-				cmdarray+=("${!a}")
-			done
+		echo "Reading further parameters"
+		for ((a=2; a<=${#}; a++)); do
+                     echo "command specified: ${!a}"
+                     cmdarray+=("${!a}")
+		done
         fi
 fi
 
