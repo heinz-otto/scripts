@@ -17,7 +17,7 @@ my $fhemcmd;
      print 'fhemcl [http://<hostName>:]<portNummer> "FHEM command1" "FHEM command2"',"\n";
      print 'fhemcl [http://<hostName>:]<portNummer> filename',"\n";
      print 'echo -e "set Aktor01 toggle" | [http://<hostName>:]<portNumber>',"\n";
-	exit;
+     exit;
  }
 
 if ($ARGV[0] !~ m/:/) {
