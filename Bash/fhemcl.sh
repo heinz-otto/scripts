@@ -8,7 +8,7 @@ then
      echo 'fhemcl Usage'
      echo 'fhemcl [http://<hostName>:]<portNummer> "FHEM command1" "FHEM command2"'
      echo 'fhemcl [http://<hostName>:]<portNummer> filename'
-     echo 'echo -e "set Aktor01 toggle" | [http://<hostName>:]<portNumber>'
+     echo 'echo -e "set Aktor01 toggle" | fhemcl [http://<hostName>:]<portNumber>'
      exit 1
 fi
 
