@@ -1,2 +1,2 @@
 # scripts
-Her are some Scripts
+Her are some Scripts in different languages
