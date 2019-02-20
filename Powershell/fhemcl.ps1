@@ -56,6 +56,7 @@ if ($cmdarray.length -eq 0) {
 # send all commands to FHEM
 foreach ($cmd in $cmdarray){
 # there is still an error message with Basic Auth and commands like set Aktor01 ..  e.g. list is without any error.
+   $cmd=[System.Uri]::EscapeDataString($cmd)
    $web = Invoke-WebRequest -Uri "$hosturl/fhem?cmd=$cmd&fwcsrf=$token" -Headers $headers
    if ($web.content.IndexOf("<pre>") -ne -1) {$web.content.Substring($web.content.IndexOf("<pre>"),$web.content.IndexOf("</pre>")-$web.content.IndexOf("<pre>")) -replace '<[^>]+>',''}
 }
