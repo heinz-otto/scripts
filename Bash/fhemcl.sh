@@ -24,10 +24,10 @@ then
     if [[ `echo "$1" | grep -E ^[[:digit:]]+$` ]]
     then
         hosturl=http://localhost:$1
-	else
-	    echo "$1 is not a Portnumber"
-            exit 1
-	fi
+    else
+        echo "$1 is not a Portnumber"
+        exit 1
+    fi
 else
     hosturl=$1
 fi
@@ -41,39 +41,40 @@ cmdarray=()
 if [ -p /dev/stdin ]; then
         echo "Data was piped to this script!"
         # If we want to read the input line by line
-        while IFS= read line; do
-              echo "Pipe Line: ${line}"
+        while IFS= read -r line; do
               cmdarray+=("${line}")
         done
 else
         # Checking the 2 parameter: filename exist or simple commands
         if [ -f "$2" ]; then
-                echo "Filename specified: ${2}"
-                echo "Reading File.."
-                while IFS= read line; do
-		      echo "File Line: ${line}"
-                      cmdarray+=("${line}")
-		done < ${2}
+            echo "Reading File: ${2}"
+			readarray -t cmdarray < ${2}
         else
-		echo "Reading further parameters"
-		for ((a=2; a<=${#}; a++)); do
-                     echo "command specified: ${!a}"
-                     cmdarray+=("${!a}")
-		done
+        echo "Reading further parameters"
+        for ((a=2; a<=${#}; a++)); do
+            echo "command specified: ${!a}"
+            cmdarray+=("${!a}")
+        done
         fi
 fi
 
 # loop over all lines stepping up. For stepping down (i=${#cmdarray[*]}; i>0; i--)
-for ((i=1; i<=${#cmdarray[*]}; i++));do 
-    echo "proceeding Line ${i-1}:"${cmdarray[i-1]}
-	# urlencode loop over String
-    cmd=''
-    for ((pos=0;pos<${#cmdarray[i-1]};pos++)); do
-        c=${cmdarray[i-1]:$pos:1}
+for ((i=0; i<${#cmdarray[*]}; i++));do 
+    cmd=${cmdarray[i]}
+	while [ ${cmd:${#cmd}-2:1} = '\' ];do 
+	      ((i++))
+	      cmd=${cmd::-2}$'\n'${cmdarray[i]}
+	done
+    echo "proceeding Line $i : "${cmd}
+    # urlencode loop over String
+    cmdu=''
+    for ((pos=0;pos<${#cmd};pos++)); do
+        c=${cmd:$pos:1}
         [[ "$c" =~ [a-zA-Z0-9\.\~\_\-] ]] || printf -v c '%%%02X' "'$c"
-        cmd+="$c"
+        cmdu+="$c"
     done
-	# send command to FHEM and filter the output (tested with list...).
-	# give only lines between, including the two Tags zurück, then remove all HTML Tags 
-	curl -s --data "fwcsrf=$token" $hosturl/fhem?cmd=$cmd | sed -n '/<pre>/,/<\/pre>/p' |sed 's/<[^>]*>//g'
+	cmd=$cmdu
+    # send command to FHEM and filter the output (tested with list...).
+    # give only lines between, including the two Tags back, then remove all HTML Tags 
+    curl -s --data "fwcsrf=$token" $hosturl/fhem?cmd=$cmd | sed -n '/<pre>/,/<\/pre>/p' |sed 's/<[^>]*>//g'
 done
