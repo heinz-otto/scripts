@@ -48,7 +48,7 @@ else
         # Checking the 2 parameter: filename exist or simple commands
         if [ -f "$2" ]; then
             echo "Reading File: ${2}"
-			readarray -t cmdarray < ${2}
+            readarray -t cmdarray < ${2}
         else
         echo "Reading further parameters"
         for ((a=2; a<=${#}; a++)); do
@@ -61,10 +61,10 @@ fi
 # loop over all lines stepping up. For stepping down (i=${#cmdarray[*]}; i>0; i--)
 for ((i=0; i<${#cmdarray[*]}; i++));do 
     cmd=${cmdarray[i]}
-	while [ ${cmd:${#cmd}-2:1} = '\' ];do 
-	      ((i++))
-	      cmd=${cmd::-2}$'\n'${cmdarray[i]}
-	done
+    while [ ${cmd:${#cmd}-2:1} = '\' ];do 
+          ((i++))
+          cmd=${cmd::-2}$'\n'${cmdarray[i]}
+    done
     echo "proceeding Line $i : "${cmd}
     # urlencode loop over String
     cmdu=''
@@ -73,7 +73,7 @@ for ((i=0; i<${#cmdarray[*]}; i++));do
         [[ "$c" =~ [a-zA-Z0-9\.\~\_\-] ]] || printf -v c '%%%02X' "'$c"
         cmdu+="$c"
     done
-	cmd=$cmdu
+    cmd=$cmdu
     # send command to FHEM and filter the output (tested with list...).
     # give only lines between, including the two Tags back, then remove all HTML Tags 
     curl -s --data "fwcsrf=$token" $hosturl/fhem?cmd=$cmd | sed -n '/<pre>/,/<\/pre>/p' |sed 's/<[^>]*>//g'
