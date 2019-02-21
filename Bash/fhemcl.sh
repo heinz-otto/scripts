@@ -60,6 +60,7 @@ fi
 
 # loop over all lines stepping up. For stepping down (i=${#cmdarray[*]}; i>0; i--)
 for ((i=0; i<${#cmdarray[*]}; i++));do 
+    # concat def lines with ending \ to the next line
     cmd=${cmdarray[i]}
     while [ ${cmd:${#cmd}-2:1} = '\' ];do 
           ((i++))
