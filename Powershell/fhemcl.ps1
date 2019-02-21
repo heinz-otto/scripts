@@ -1,13 +1,13 @@
-﻿<#
-.SYNOPSIS	
+<#
+.SYNOPSIS
     This Script is a FHEM Client for HTTP
-.DESCRIPTION	
+.DESCRIPTION
     FHEM commands could given over the Pipe, Arguments or File.
-.EXAMPLE	
+.EXAMPLE
     fhemcl [http://<hostName>:]<portNummer> "FHEM command1" "FHEM command2"
     fhemcl [http://<hostName>:]<portNummer> filename
     echo "FHEM command"|fhemcl [http://<hostName>:]<portNummer>
-.NOTES	
+.NOTES
     put every FHEM command line in ""
 #>
 #region Params
@@ -57,9 +57,11 @@ if ($cmdarray.length -eq 0) {
 # there is still an error message with Basic Auth and commands like set Aktor01 ..  e.g. list is without any error.
 
 for ($i=0; $i -lt $cmdarray.Length; $i++) {
+   # concat def lines with ending \ to the next line
    $cmd = $cmdarray[$i]
    while($cmd.EndsWith('\')) {$cmd=$cmd.Remove($cmd.Length - 1,1) + "`n" + $cmdarray[$i+1];$i++}
    write-output "proceeding line $($i+1) : $cmd"
+   # url encode
    $cmd=[System.Uri]::EscapeDataString($cmd)
    $web = Invoke-WebRequest -Uri "$hosturl/fhem?cmd=$cmd&fwcsrf=$token" -Headers $headers
    if ($web.content.IndexOf("<pre>") -ne -1) {$web.content.Substring($web.content.IndexOf("<pre>"),$web.content.IndexOf("</pre>")-$web.content.IndexOf("<pre>")) -replace '<[^>]+>',''}
