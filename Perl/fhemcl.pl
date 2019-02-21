@@ -52,6 +52,7 @@ if (-p STDIN) {
 if ($ARGV[1] and -e $ARGV[1]) {
     open(DATA, '<', $ARGV[1]);
     while(<DATA>) {
+       s/\r[\n]*/\n/gm;      #remove any \r 
        chomp($_);
        push(@cmdarray,$_);
     }
@@ -63,16 +64,25 @@ else {
     }
 }
 #execute commands and print response from FHEMWEB 
-for(@cmdarray) {
-    $fhemcmd = uri_escape($_);
+for(my $i = 0; $i < @cmdarray; $i++) {
+    # concat def lines with ending \ to the next line
+    my $cmd = $cmdarray[$i];
+    while ($cmd =~ m/\\$/) {
+        $i++;
+        $cmd = substr($cmd,0, -1)."\n".$cmdarray[$i];
+    };
+    # url encode the cmd
+    $fhemcmd = uri_escape($cmd);
+    print "proceeding line $i : $fhemcmd\n";
     $url = "$hosturl/fhem?cmd=$fhemcmd&fwcsrf=$token";
     $resp = $ua->get($url)->content;
-	# only between the lines <pre></pre> and remove any HTML Tag
-	my @resparray = split("\n", $resp);
-	foreach my $zeile(@resparray){
-		if ($zeile !~ /<[^>]*>/ or $zeile =~ /pre>/ or $zeile =~ /NAME/) {
-		   $zeile =~ s/<[^>]*>//g;
-		   print "$zeile\n" ;
-		}
+    # only between the lines <pre></pre> and remove any HTML Tag
+    #funktioniert noch nicht sauber bei massenimport
+    my @resparray = split("\n", $resp);
+    foreach my $zeile(@resparray){
+        if ($zeile !~ /<[^>]*>/ or $zeile =~ /pre>/ or $zeile =~ /NAME/) {
+           $zeile =~ s/<[^>]*>//g;
+           print "$zeile\n" ;
+        }
     }
 }
