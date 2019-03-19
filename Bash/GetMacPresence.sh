@@ -1,6 +1,9 @@
+#!/bin/bash
+# MAC Adress and Hostname for OpenWrt Router as Parameter, user is "root"
 MAC=$1
 host=$2
 user="root"
+# Code between ' ' is remotely executed. Output is 0 or 1 (if MAC detected)
 ssh $user@$host '
     if (
       for m in $(
