@@ -1,4 +1,5 @@
 #!/bin/bash
+# detect over ssh if Wlan Client (MAC) is connected to OpenWrt Router
 # MAC Adress and Hostname for OpenWrt Router as Parameter, user is "root"
 MAC=$1
 host=$2
