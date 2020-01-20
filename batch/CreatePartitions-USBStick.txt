@@ -1,0 +1,21 @@
+rem == CreatePartitions-USB-Stick.txt ==
+rem == These commands are used with DiskPart to
+rem    create three partitions
+rem    for a BIOS/MBR-based computer.
+rem    Adjust the partition sizes to fill the drive
+rem    as necessary. ==
+select disk 3
+clean
+rem == 1. Boot partition ======================
+create partition primary size=512
+format quick fs=fat32 label="BOOT"
+assign letter="k"
+active
+rem == 2. Backup partition =====================
+create partition primary
+format quick fs=ntfs label="BACKUP"
+assign letter="l"
+list volume
+remove letter="l"
+remove letter="k"
+exit
