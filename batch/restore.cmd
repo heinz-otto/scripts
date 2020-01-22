@@ -10,12 +10,13 @@ REM Eingabe Schleife
 REM Diese ungefaehrliche Vorbelegung, falls einfach Enter betaetigt wird.
 set Eingabe=x
 :Loop
-set /P Eingabe="Die Disk wird komplett geloescht, bitte Nr bestaetigen (x Abbruch): "
+REM derzeit fix auf Disk 0
+set /P Eingabe="Die Disk 0 wird komplett geloescht, bitte Nr bestaetigen (x Abbruch): "
 set "zeichen=%Eingabe:~0,1%" & REM Erstes Zeichen extrahieren
-set /a "nummer=%zeichen%" & REM und als Zahl Åbergeben
+set /a "nummer=%zeichen%" & REM und als Zahl ¬Åbergeben
 if %zeichen% == %nummer% goto :prog1
 if /i %zeichen%==x goto :eof
-Echo Falsche Eingabe "%Eingabe%" erstes Zeichen %zeichen% - Bitte nur 0-9 eingeben oder X fÅr Abbrechen
+Echo Falsche Eingabe "%Eingabe%" erstes Zeichen %zeichen% - Bitte nur 0-9 eingeben oder X f¬År Abbrechen
 if %zeichen% NEQ %nummer% goto :Loop
 goto :Loop
 
