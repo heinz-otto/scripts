@@ -12,5 +12,6 @@ active
 rem == 2. Backup partition =====================
 create partition primary
 format quick fs=ntfs label="BACKUP"
+assign
 list volume
 exit
