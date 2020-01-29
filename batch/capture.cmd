@@ -1,5 +1,6 @@
 @echo off & setlocal
-REM Diese Script stellt eine Windows System Disk komplett mit Neupartitionierung und Image wieder her
+REM Diese Script erstellt von einer Windows System Disk ein wim Image
+REM Ein laufwerk mit dem Ordner \wim muss existieren
 REM setze den Imagenamen
 set image=backup.wim
 REM finde die Laufwerke anhand von Pfaden, der niedrigste Buchstabe wir gefunden
