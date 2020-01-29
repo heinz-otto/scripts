@@ -6,4 +6,6 @@ cd /D %~dp0
 REM Deutsche Tastatur setzen
 wpeutil SetKeyboardLayout 0407:00000407
 REM starte weitere Prozesse und behalte dieses "lokalisierte" Fenster 
-start call restore.cmd
+echo on
+REM start call restore.cmd
+start
