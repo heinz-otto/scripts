@@ -13,10 +13,10 @@ set Eingabe=x
 :Loop
 set /P Eingabe="Die Disk wird komplett geloescht, bitte Nr bestaetigen (x Abbruch): "
 set "zeichen=%Eingabe:~0,1%" & REM Erstes Zeichen extrahieren
-set /a "nummer=%zeichen%" & REM und als Zahl uebergeben
+set /a "nummer=%zeichen%" & REM und als Zahl uebergeben
 if %zeichen% == %nummer% goto :prog1
 if /i %zeichen%==x goto :eof
-Echo Falsche Eingabe "%Eingabe%" erstes Zeichen %zeichen% - Bitte nur 0-9 eingeben oder X fr Abbrechen
+Echo Falsche Eingabe "%Eingabe%" erstes Zeichen %zeichen% - Bitte nur 0-9 eingeben oder X fuer Abbrechen
 if %zeichen% NEQ %nummer% goto :Loop
 goto :Loop
 
