@@ -1,4 +1,5 @@
 #!/bin/sh
+# For FHEM, will restore "last known good configuration" if something goes wrong
 # the script will give all paths below $rd including the 2 last backups
 # select one by hand and exit after restore
 
