@@ -22,7 +22,7 @@ attr DEVICE setList\
   previous:noArg BASE_TOPIC/DEV_ID/control { "command": "previous" }\
   joinGroup:textField BASE_TOPIC/DEV_ID/control {  "command": "joingroup",  "input": "$EVTPART1"}\
   leaveGroup:noArg { my $value = ReadingsVal("DEV_ID","groupName","all");; qq(BASE_TOPIC/DEV_ID/control { "command": "leavegroup",  "input": "$value" } ) }\
-  setAVTUri:textField sonos/RINCON_7828CA0CB0F201400/control {  "command": "setavtransporturi",  "input": "$EVTPART1"}
+  setAVTUri:textField BASE_TOPIC/DEV_ID//control {  "command": "setavtransporturi",  "input": "$EVTPART1"}
 attr DEVICE model sonos2mqtt_speaker
 attr DEVICE alias ALIAS
 
