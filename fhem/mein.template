@@ -16,12 +16,16 @@ attr DEVICE setList\
   stop:noArg BASE_TOPIC/DEV_ID/control { "command": "stop" }\
   play:noArg BASE_TOPIC/DEV_ID/control { "command": "play" }\
   pause:noArg BASE_TOPIC/DEV_ID/control { "command": "pause" }\
+  toggle:noArg BASE_TOPIC/DEV_ID/control { "command": "toggle" }\
+  switchToQueue:noArg BASE_TOPIC/DEV_ID/control { "command": "switchtoqueue" }\
   switchToTv:noArg BASE_TOPIC/DEV_ID/control { "command": "switchtotv" }\
+  switchToLine:noArg BASE_TOPIC/DEV_ID/control { "command": "switchtoline" }\
   volume:slider,0,1,100 BASE_TOPIC/DEV_ID/control { "command": "volume", "input": $EVTPART1 }\
   mute:on,off { my $value = $EVTPART1 eq "on" ? "mute" : "unmute";; qq(BASE_TOPIC/DEV_ID/control { "command": "$value" } ) }\
   next:noArg BASE_TOPIC/DEV_ID/control { "command": "next" }\
   previous:noArg BASE_TOPIC/DEV_ID/control { "command": "previous" }\
   adv-command:textField BASE_TOPIC/DEV_ID/control {"command":"adv-command","input":$EVTPART1}\
+  command:textField BASE_TOPIC/DEV_ID/control {"command":$EVTPART1}\
   joinGroup:textField BASE_TOPIC/DEV_ID/control {  "command": "joingroup",  "input": "$EVTPART1"}\
   leaveGroup:noArg { my $value = ReadingsVal("DEV_ID","groupName","all");; qq(BASE_TOPIC/DEV_ID/control { "command": "leavegroup",  "input": "$value" } ) }\
   setAVTUri:textField BASE_TOPIC/DEV_ID/control {  "command": "setavtransporturi",  "input": "$EVTPART1"}\
