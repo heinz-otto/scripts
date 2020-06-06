@@ -8,6 +8,8 @@ par:DEVNAME;friendly name as set in sonos gadget itself;{ lc(ReadingsVal("DEVICE
 par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","audio_volume_low") }
 par:ALIAS;Alias set;{ ReadingsVal("DEVICE","name","unknown") }
 attr DEVICE icon ICON
+attr DEVICE stateFormat transportState
+attr DEVICE jsonMap volume_Master:volume mute_Master:mute
 attr DEVICE readingList\
   BASE_TOPIC/status/DEVNAME/avtransport:.* { json2nameValue($EVENT,'AV_',$JSONMAP) }\
   BASE_TOPIC/status/DEVNAME/renderingcontrol:.* { json2nameValue($EVENT,'REND_',$JSONMAP) }\
@@ -33,4 +35,4 @@ attr DEVICE setList\
 attr DEVICE model sonos2mqtt_speaker
 attr DEVICE alias ALIAS
 
-setreading DEVICE attrTemplateVersion 20200605
+setreading DEVICE attrTemplateVersion 20200606
