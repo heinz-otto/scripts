@@ -8,15 +8,18 @@ par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","sc
 attr DEVICE icon ICON
 attr DEVICE readingList BASE_TOPIC/DEV_ID/commandOut:.* { json2nameValue($EVENT,'',$JSONMAP) }
 attr DEVICE model worx_landroid_mover
-attr DEVICE jsonMap dat_rsi:rssi dat_fw:firmware_version cfg_sn:SerialNumber\
+attr DEVICE jsonMap dat_rsi:wifiQuality dat_fw:firmware cfg_sn:SerialNumber\
 dat_le:mowerErrorIndex dat_ls:mowerStatusIndex cfg_sc_m:mowerActiveIndex\
 dat_bt_t:batteryTemperature dat_bt_v:batteryVoltage dat_bt_p:batteryLevel dat_bt_nr:batteryChargeCycle dat_bt_c:batteryCharging\
+dat_st_b:bladeTimeCounter\
 dat_dmp_1:directionPitch dat_dmp_2:directionRoll dat_dmp_3:directionYaw
-attr DEVICE setList startMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":1}\
+attr DEVICE setList mowerRainDelay:slider,0,30,1440 BASE_TOPIC/DEV_ID/commandIn {"rd":$EVTPART1}\
+mowerTimeCorrection:slider,-100,1,100 BASE_TOPIC/DEV_ID/commandIn {"sc":$EVTPART1}\
+startMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":1}\
 pauseMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":2}\
 stopMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":3}
-attr DEVICE userReadings mowerStatusTxt {\
-my %stateCodes = (\
+attr DEVICE userReadings mowerActive {ReadingsVal($name,"mowerActiveIndex","0") ? "true" : "false"},\
+mowerStatusTxt {my %stateCodes = (\
  0 => "Idle",\
  1 => "Home",\
  2 => "Start sequence",\
@@ -35,6 +38,26 @@ my %stateCodes = (\
  32 => "Edge cutting",\
  33 => "Searching zone",\
  34 => "Pause"\
- ); $stateCodes{ReadingsVal($name,"mowerStatusIndex","0")}}
+ ); $stateCodes{ReadingsVal($name,"mowerStatusIndex","0")}},\
+mowerErrorTxt { my %errorCodes = (\
+ 0 => "No error",\
+ 1 => "Trapped",\
+ 2 => "Lifted",\
+ 3 => "Wire missing",\
+ 4 => "Outside wire",\
+ 5 => "Raining",\
+ 6 => "Close door to mow",\
+ 7 => "Close door to go home",\
+ 8 => "Blade motor blocked",\
+ 9 => "Wheel motor blocked",\
+ 10 => "Trapped timeout",\
+ 11 => "Upside down",\
+ 12 => "Battery low",\
+ 13 => "Reverse wire",\
+ 14 => "Charge error",\
+ 15 => "Timeout finding home",\
+ 16 => "Mower locked",\
+ 17 => "Battery temp out of range"\
+ ); $errorCodes{ReadingsVal($name,"mowerErrorIndex","0")}}
 
 setreading DEVICE attrTemplateVersion 20200607
