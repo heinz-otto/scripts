@@ -6,10 +6,35 @@ par:BASE_TOPIC;base topic set from the BoardID;{ AttrVal("DEVICE","devicetopic",
 par:DEV_ID;MAC of the device ;{ AttrVal("DEVICE","readingList","") =~ m,[^\/]+[\/]([0-9A-Z]+)[\/]commandOut:.*, ? $1 : undef }
 par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","scene_robo_lawnmower") }
 attr DEVICE icon ICON
-attr DEVICE readingList BASE_TOPIC/DEV_ID/commandOut:.* { json2nameValue($EVENT, '', $JSONMAP) }
+attr DEVICE readingList BASE_TOPIC/DEV_ID/commandOut:.* { json2nameValue($EVENT,'',$JSONMAP) }
 attr DEVICE model worx_landroid_mover
-attr DEVICE jsonMap dat_rsi:rssi dat_fw:firmware_version
+attr DEVICE jsonMap dat_rsi:rssi dat_fw:firmware_version cfg_sn:SerialNumber\
+dat_le:mowerErrorIndex dat_ls:mowerStatusIndex cfg_sc_m:mowerActiveIndex\
+dat_bt_t:batteryTemperature dat_bt_v:batteryVoltage dat_bt_p:batteryLevel dat_bt_nr:batteryChargeCycle dat_bt_c:batteryCharging\
+dat_dmp_1:directionPitch dat_dmp_2:directionRoll dat_dmp_3:directionYaw
 attr DEVICE setList startMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":1}\
 pauseMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":2}\
 stopMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":3}
+attr DEVICE userReadings mowerStatusTxt {\
+my %stateCodes = (\
+ 0 => "Idle",\
+ 1 => "Home",\
+ 2 => "Start sequence",\
+ 3 => "Leaving home",\
+ 4 => "Follow wire",\
+ 5 => "Searching home",\
+ 6 => "Searching wire",\
+ 7 => "Mowing",\
+ 8 => "Lifted",\
+ 9 => "Trapped",\
+ 10 => "Blade blocked",\
+ 11 => "Debug",\
+ 12 => "Remote control",\
+ 30 => "Going home",\
+ 31 => "Zone Training",\
+ 32 => "Edge cutting",\
+ 33 => "Searching zone",\
+ 34 => "Pause"\
+ ); $stateCodes{ReadingsVal($name,"mowerStatusIndex","0")}}
+
 setreading DEVICE attrTemplateVersion 20200607
