@@ -9,9 +9,10 @@ attr DEVICE icon ICON
 attr DEVICE readingList BASE_TOPIC/DEV_ID/commandOut:.* { json2nameValue($EVENT,'',$JSONMAP) }
 attr DEVICE model worx_landroid_mover
 attr DEVICE jsonMap dat_rsi:wifiQuality dat_fw:firmware cfg_sn:SerialNumber\
-dat_le:mowerErrorIndex dat_ls:mowerStatusIndex cfg_sc_m:mowerActiveIndex\
+dat_le:mowerErrorIndex dat_ls:mowerStatusIndex\
+cfg_rd:mowerRainDelay cfg_sc_m:mowerActiveIndex cfg_sc_p:mowerTimeCorrection\
 dat_bt_t:batteryTemperature dat_bt_v:batteryVoltage dat_bt_p:batteryLevel dat_bt_nr:batteryChargeCycle dat_bt_c:batteryCharging\
-dat_st_b:bladeTimeCounter\
+dat_st_b:bladeTimeCounter dat_st_d:totalDistance dat_st_wt:totalTime\
 dat_dmp_1:directionPitch dat_dmp_2:directionRoll dat_dmp_3:directionYaw
 attr DEVICE setList mowerRainDelay:slider,0,30,1440 BASE_TOPIC/DEV_ID/commandIn {"rd":$EVTPART1}\
 mowerTimeCorrection:slider,-100,1,100 BASE_TOPIC/DEV_ID/commandIn {"sc":$EVTPART1}\
