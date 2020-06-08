@@ -2,11 +2,11 @@ name:sonos2mqtt_speaker1
 desc:A sonos2mqtt speaker device1
 filter:TYPE=MQTT2_DEVICE
 order:M_05b
-par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^/:]+)[/].+, ? $1 : undef }
-par:DEV_ID;techname of the device ;{ AttrVal("DEVICE","readingList","") =~ m,[^/]+[/](RINCON_[0-9A-Z]+):.*, ? $1 : undef }
-par:DEVNAME;friendly name as set in sonos gadget itself;{ lc(ReadingsVal("DEVICE","name","unknown")) }
+par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
+par:DEV_ID;techname of the device ;{ AttrVal("DEVICE","readingList","") =~ m,[^\/]+[\/](RINCON_[0-9A-Z]+):.*, ? $1 : undef }
+par:ALIAS;friendly name as set in sonos gadget itself;{ ReadingsVal("DEVICE","name","unknown") }
+par:DEVNAME;friendly name, used for topic in lowercase;{ lc(ReadingsVal("DEVICE","name","unknown")) }
 par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","audio_volume_low") }
-par:ALIAS;Alias set;{ ReadingsVal("DEVICE","name","unknown") }
 attr DEVICE icon ICON
 attr DEVICE jsonMap volume_Master:volume mute_Master:mute transportState:state
 attr DEVICE readingList\
@@ -29,9 +29,9 @@ attr DEVICE setList\
   previous:noArg BASE_TOPIC/DEV_ID/control { "command": "previous" }\
   adv-command:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/control {"command":"adv-command","input":$payload})}\
   command:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/control {"command":$payload})}\
-  joinGroup:textField BASE_TOPIC/DEV_ID/control {  "command": "joingroup",  "input": "$EVTPART1"}\
+  joinGroup:textField BASE_TOPIC/DEV_ID/control { "command": "joingroup",  "input": "$EVTPART1"}\
   leaveGroup:noArg { my $value = ReadingsVal("DEV_ID","groupName","all"); qq(BASE_TOPIC/DEV_ID/control { "command": "leavegroup",  "input": "$value" } ) }\
-  setAVTUri:textField BASE_TOPIC/DEV_ID/control {  "command": "setavtransporturi",  "input": "$EVTPART1"}\
+  setAVTUri:textField BASE_TOPIC/DEV_ID/control { "command": "setavtransporturi",  "input": "$EVTPART1"}\
   notify:textField BASE_TOPIC/DEV_ID/control { "command":"notify","input":{"trackUri":"$EVTPART2","onlyWhenPlaying":false,"timeout":10,"volume":$EVTPART1,"delayMs":700}}
 attr DEVICE model sonos2mqtt_speaker
 attr DEVICE alias ALIAS
