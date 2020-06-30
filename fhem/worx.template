@@ -16,6 +16,8 @@ dat_st_b:bladeTimeCounter dat_st_d:totalDistance dat_st_wt:totalTime\
 dat_dmp_1:directionPitch dat_dmp_2:directionRoll dat_dmp_3:directionYaw
 attr DEVICE setList mowerRainDelay:slider,0,30,1440 BASE_TOPIC/DEV_ID/commandIn {"rd":$EVTPART1}\
 mowerTimeCorrection:slider,-100,1,100 BASE_TOPIC/DEV_ID/commandIn {"sc":{"p":$EVTPART1}}\
+startBoderCut:noArg BASE_TOPIC/DEV_ID/commandIn {"sc":{"ots":{"bc":1,"wtm":0}}}\
+startOneTime:slider,10,1,100 BASE_TOPIC/DEV_ID/commandIn {"sc":{"ots":{"bc":0,"wtm":$EVTPART1}}}\
 startMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":1}\
 pauseMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":2}\
 stopMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":3}
