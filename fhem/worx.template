@@ -1,5 +1,5 @@
 name:worx_landroid
-desc:a Worx Landroid mower
+desc:Template for Worx Landroid mower\for complete Setup see https://forum.fhem.de/index.php/topic,111959
 filter:TYPE=MQTT2_DEVICE
 order:M_05c
 par:BASE_TOPIC;base topic: the Mower BoardID (2019: PRM100);{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
@@ -64,4 +64,4 @@ mowerErrorTxt { my %errorCodes = (\
  17 => "Battery temp out of range"\
  ); $errorCodes{ReadingsVal($name,"mowerErrorIndex","0")}}
 
-setreading DEVICE attrTemplateVersion 20200607
+setreading DEVICE attrTemplateVersion 20200701
