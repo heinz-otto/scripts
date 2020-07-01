@@ -1,5 +1,5 @@
 name:worx_landroid1
-desc:Template for a Worx Landroid mower.<br>The complete Setup is described in this <a href="https://forum.fhem.de/index.php/topic,111959>Forum Thread</a>
+desc:Template for a Worx Landroid mower.<br>The complete Setup is described in this <a href="https://forum.fhem.de/index.php/topic,111959">Forum Thread</a>
 filter:TYPE=MQTT2_DEVICE
 order:M_05c
 par:BASE_TOPIC;base topic: the Mower BoardID (2019: PRM100);{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
