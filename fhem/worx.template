@@ -1,4 +1,4 @@
-name:worx_landroid
+name:worx_landroid1
 desc:Template for Worx Landroid mower\for complete Setup see https://forum.fhem.de/index.php/topic,111959
 filter:TYPE=MQTT2_DEVICE
 order:M_05c
