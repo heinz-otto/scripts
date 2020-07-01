@@ -1,29 +1,29 @@
-name:worx_landroid1
-desc:Template for a Worx Landroid mower.<br>The complete Setup is described in this <a href="https://forum.fhem.de/index.php/topic,111959.0.html">Forum Thread</a>
+name:worx_landroid
+desc:Template for a Worx Landroid mower.<br>The complete Setup is described in this <a href="https://forum.fhem.de/index.php/topic,111959.0.html">Forum Thread</a><br>Some Features requires support by model and firmware!
 filter:TYPE=MQTT2_DEVICE
-order:M_05c
+order:X_05
 par:BASE_TOPIC;base topic: the Mower BoardID (2019: PRM100);{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
 par:DEV_ID;the MAC of the Mower (Device Info);{ AttrVal("DEVICE","readingList","") =~ m,[^\/]+[\/]([0-9A-Z]+)[\/]commandOut:.*, ? $1 : undef }
 par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","scene_robo_lawnmower") }
 attr DEVICE icon ICON
 attr DEVICE readingList BASE_TOPIC/DEV_ID/commandOut:.* { json2nameValue($EVENT,'',$JSONMAP) }
-attr DEVICE model worx_landroid_mover
 attr DEVICE jsonMap dat_rsi:wifiQuality dat_fw:firmware cfg_sn:SerialNumber\
 dat_le:mowerErrorIndex dat_ls:mowerStatusIndex\
 cfg_rd:mowerRainDelay cfg_sc_m:mowerActiveIndex cfg_sc_p:mowerTimeCorrection\
-dat_bt_t:batteryTemperature dat_bt_v:batteryVoltage dat_bt_p:batteryLevel dat_bt_nr:batteryChargeCycle dat_bt_c:batteryCharging\
+dat_bt_t:batteryTemperature dat_bt_v:batteryVoltage dat_bt_p:batteryPercent dat_bt_nr:batteryChargeCycle dat_bt_c:batteryCharging\
 dat_st_b:bladeTimeCounter dat_st_d:totalDistance dat_st_wt:totalTime\
 dat_dmp_1:directionPitch dat_dmp_2:directionRoll dat_dmp_3:directionYaw
 attr DEVICE setList mowerRainDelay:slider,0,30,1440 BASE_TOPIC/DEV_ID/commandIn {"rd":$EVTPART1}\
-mowerTimeCorrection:slider,-100,1,100 BASE_TOPIC/DEV_ID/commandIn {"sc":{"p":$EVTPART1}}\
-startBoderCut:noArg BASE_TOPIC/DEV_ID/commandIn {"sc":{"ots":{"bc":1,"wtm":0}}}\
-startOneTime:slider,10,10,720 BASE_TOPIC/DEV_ID/commandIn {"sc":{"ots":{"bc":0,"wtm":$EVTPART1}}}\
-startMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":1}\
-pauseMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":2}\
-stopMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":3}\
-x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/commandIn $payload)}
-attr DEVICE userReadings mowerActive {ReadingsVal($name,"mowerActiveIndex","0") ? "true" : "false"},\
-mowerStatusTxt {my %stateCodes = (\
+  mowerTimeCorrection:slider,-100,1,100 BASE_TOPIC/DEV_ID/commandIn {"sc":{"p":$EVTPART1}}\
+  startBorderCut:noArg BASE_TOPIC/DEV_ID/commandIn {"sc":{"ots":{"bc":1,"wtm":0}}}\
+  startOneTime:slider,10,10,720 BASE_TOPIC/DEV_ID/commandIn {"sc":{"ots":{"bc":0,"wtm":$EVTPART1}}}\
+  startParty:slider,60,60,2880 {"sc":{"distm":$EVTPART1}}\
+  startMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":1}\
+  pauseMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":2}\
+  stopMower:noArg BASE_TOPIC/DEV_ID/commandIn {"cmd":3}\
+  x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/commandIn $payload)}
+attr DEVICE userReadings mowerActive:mowerActiveIndex.* {ReadingsVal($name,"mowerActiveIndex","0") ? "true" : "false"},\
+mowerStatusTxt:mowerStatusIndex.* {my %stateCodes = (\
  0 => "Idle",\
  1 => "Home",\
  2 => "Start sequence",\
@@ -42,8 +42,8 @@ mowerStatusTxt {my %stateCodes = (\
  32 => "Edge cutting",\
  33 => "Searching zone",\
  34 => "Pause"\
- ); $stateCodes{ReadingsVal($name,"mowerStatusIndex","0")}},\
-mowerErrorTxt { my %errorCodes = (\
+); $stateCodes{ReadingsVal($name,"mowerStatusIndex","0")}},\
+mowerErrorTxt:mowerErrorIndex.* { my %errorCodes = (\
  0 => "No error",\
  1 => "Trapped",\
  2 => "Lifted",\
@@ -62,6 +62,6 @@ mowerErrorTxt { my %errorCodes = (\
  15 => "Timeout finding home",\
  16 => "Mower locked",\
  17 => "Battery temp out of range"\
- ); $errorCodes{ReadingsVal($name,"mowerErrorIndex","0")}}
-
+); $errorCodes{ReadingsVal($name,"mowerErrorIndex","0")}}
+attr DEVICE model worx_landroid_mover
 setreading DEVICE attrTemplateVersion 20200701
