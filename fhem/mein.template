@@ -43,7 +43,7 @@ name:sonos2mqtt_speakCommand1
   my $modelN = XML::LibXML->load_xml( string => $xmltext)->getElementsByTagName('modelNumber')->get_node(1)->textContent;\
   my @arr=split("\n",AttrVal($dev,'setList',''));\
   if ($modelN ~~ ['S14', 'S11']) {push @arr , '  switchtotv:noArg sonos/'.ReadingsVal($dev,'uuid','').'/control { "command": "switchtotv" }'; }\
-  if ($modelN ~~ ['S5']) {push @arr , '  switchtoline:noArg sonos/'.ReadingsVal($dev,'uuid','').'/control { "command": "switchtoline" }'; }\
+  if ($modelN ~~ ['S5','Z90','ZP120']) {push @arr , '  switchtoline:noArg sonos/'.ReadingsVal($dev,'uuid','').'/control { "command": "switchtoline" }'; }\
   push @arr , q(  speak:textField { my $tts="SonosTTS";my $payload = $EVENT;$payload =~ s/$EVTPART0 $EVTPART1 //g; fhem("setreading $tts Player $NAME;setreading $tts volume $EVTPART1;set $tts tts $payload");"{}"});\
   my $newVal=join "\n",@arr;\
   $newVal=~s/;/;;/g;\
