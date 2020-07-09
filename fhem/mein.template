@@ -37,10 +37,16 @@ setreading DEVICE attrTemplateVersion 20200705
 #
 name:sonos2mqtt_speakCommand1
 {\
-  my $nn='DEVICE';\
-  my @arr=split("\n",AttrVal($nn,'setList',''));\
+  use XML::LibXML;\
+  my $dev='DEVICE';\
+  my $xmltext = GetFileFromURL((split("getaa",ReadingsVal($dev,'currentTrack_AlbumArtUri','')))[0].'xml/device_description.xml');\
+  my $modelN = XML::LibXML->load_xml( string => $xmltext)->getElementsByTagName('modelNumber')->get_node(1)->textContent;\
+  my @arr=split("\n",AttrVal($dev,'setList',''));\
+  if ($modelN ~~ ['S14', 'S11']) {push @arr , '  switchtotv:noArg sonos/'.ReadingsVal($dev,'uuid','').'/control { "command": "switchtotv" }'; }\
+  if ($modelN ~~ ['S5']) {push @arr , '  switchtoline:noArg sonos/'.ReadingsVal($dev,'uuid','').'/control { "command": "switchtoline" }'; }\
   push @arr , q(  speak:textField { my $tts="SonosTTS";my $payload = $EVENT;$payload =~ s/$EVTPART0 $EVTPART1 //g; fhem("setreading $tts Player $NAME;setreading $tts volume $EVTPART1;set $tts tts $payload");"{}"});\
   my $newVal=join "\n",@arr;\
   $newVal=~s/;/;;/g;\
-  fhem("attr $nn setList $newVal")\
+  fhem("attr $dev setList $newVal");\
+  fhem("setreading $dev modelNumber $modelN");\
 }
