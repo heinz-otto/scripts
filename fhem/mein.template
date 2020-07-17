@@ -27,7 +27,7 @@ attr DEVICE setList\
   joinGroup:textField BASE_TOPIC/DEV_ID/control { "command": "joingroup",  "input": "$EVTPART1"}\
   leaveGroup:noArg { my $value = ReadingsVal("DEV_ID","groupName","all"); qq(BASE_TOPIC/DEV_ID/control { "command": "leavegroup",  "input": "$value" } ) }\
   setAVTUri:textField BASE_TOPIC/DEV_ID/control { "command": "setavtransporturi",  "input": "$EVTPART1"}\
-  playUri:textField {fhem("sleep 1; set $NAME play"); qq(BASE_TOPIC/DEV_ID/control { "command": "setavtransporturi",  "input": "$EVTPART1"})}\
+  playUri:textField {fhem("set $NAME setAVTUri $EVTPART1; sleep 1; set $NAME play")}\
   switchtoqueue:noArg BASE_TOPIC/DEV_ID/control { "command": "switchtoqueue" }\
   notify:textField BASE_TOPIC/DEV_ID/control { "command":"notify","input":{"trackUri":"$EVTPART2","onlyWhenPlaying":false,"timeout":10,"volume":$EVTPART1,"delayMs":700}}\
   x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/control $payload)}
