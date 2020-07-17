@@ -34,7 +34,7 @@ attr DEVICE setList\
 attr DEVICE model sonos2mqtt_speaker
 attr DEVICE alias ALIAS
 
-setreading DEVICE attrTemplateVersion 20200705
+setreading DEVICE attrTemplateVersion 20200717
 #
 name:sonos2mqtt_speakCommand1
 {\
