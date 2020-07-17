@@ -10,8 +10,6 @@ par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","au
 attr DEVICE icon ICON
 attr DEVICE jsonMap volume_Master:volume mute_Master:mute transportState:state
 attr DEVICE readingList\
-  BASE_TOPIC/status/DEVNAME/avtransport:.* { json2nameValue($EVENT,'AV_',$JSONMAP) }\
-  BASE_TOPIC/status/DEVNAME/renderingcontrol:.* { json2nameValue($EVENT,'REND_',$JSONMAP) }\
   BASE_TOPIC/DEV_ID:.* { json2nameValue($EVENT,'',$JSONMAP) }
 attr DEVICE setList\
   stop:noArg BASE_TOPIC/DEV_ID/control { "command": "stop" }\
