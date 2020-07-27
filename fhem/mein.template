@@ -52,7 +52,7 @@ name:sonos2mqtt_speakCommand1
 name:sonos2mqtt_bridge_comfort1
 desc:The sonos2mqtt bridge including automated setup for speaker devices
 filter:TYPE=MQTT2_DEVICE
-order:M_01b
+order:M_05c
 set DEVICE attrTemplate sonos2mqtt_bridge
 define n_configSonos1 notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ sleep 1;set $EVTPART1 attrTemplate sonos2mqtt_speaker;set $EVTPART1 x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}
 define n_configSonos2 notify MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {\
