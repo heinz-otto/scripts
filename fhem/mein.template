@@ -56,14 +56,12 @@ order:M_05c
 set DEVICE attrTemplate sonos2mqtt_bridge
 define n_configSonos1 notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ sleep 1;set $EVTPART1 attrTemplate sonos2mqtt_speaker;set $EVTPART1 x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}
 define n_configSonos2 notify MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {\
-  use XML::Simple qw(:strict);\
   no warnings 'experimental::smartmatch';\
   my @tv = ("S14","S11");\
   my $url="http://$EVTPART1:1400";\
   my $xmltext = GetFileFromURL("$url/xml/device_description.xml");\
-  my $ref = XMLin($xmltext, KeyAttr => { }, ForceArray => [ ]);\
-  my $mn=$ref->{device}{modelNumber};\
-  my $img=$ref->{device}{iconList}{icon}{url};\
+  my ($mn)=$xmltext =~ /<modelNumber>(S[0-9]+)/;\
+  my ($img)=$xmltext =~ /<url>(.*)<\/url>/;\
   my $icon="Sonos2mqtt_icon-$mn";\
   my $setList=AttrVal($NAME,'setList','');\
   fhem("setreading $NAME modelNumber $mn");\
