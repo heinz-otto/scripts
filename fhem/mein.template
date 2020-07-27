@@ -1,5 +1,5 @@
 name:sonos2mqtt_speaker1
-desc:A sonos2mqtt speaker device1
+desc:A basic sonos2mqtt speaker device1
 filter:TYPE=MQTT2_DEVICE
 order:M_05b
 par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
@@ -16,10 +16,10 @@ attr DEVICE setList\
   play:noArg BASE_TOPIC/DEV_ID/control { "command": "play" }\
   pause:noArg BASE_TOPIC/DEV_ID/control { "command": "pause" }\
   toggle:noArg BASE_TOPIC/DEV_ID/control { "command": "toggle" }\
-  volumeup:noArg BASE_TOPIC/DEV_ID/control { "command": "volumeup" }\
-  volumedown:noArg BASE_TOPIC/DEV_ID/control { "command": "volumedown" }\
+  volumeUp:noArg BASE_TOPIC/DEV_ID/control { "command": "volumeup" }\
+  volumeDown:noArg BASE_TOPIC/DEV_ID/control { "command": "volumedown" }\
   volume:slider,0,1,100 BASE_TOPIC/DEV_ID/control { "command": "volume", "input": $EVTPART1 }\
-  mute:on,off { my $value = $EVTPART1 eq "on" ? "mute" : "unmute"; qq(BASE_TOPIC/DEV_ID/control { "command": "$value" } ) }\
+  mute:true,false { my $value = $EVTPART1 eq "true" ? "mute" : "unmute"; qq(BASE_TOPIC/DEV_ID/control { "command": "$value" } ) }\
   next:noArg BASE_TOPIC/DEV_ID/control { "command": "next" }\
   previous:noArg BASE_TOPIC/DEV_ID/control { "command": "previous" }\
   joinGroup:textField BASE_TOPIC/DEV_ID/control { "command": "joingroup",  "input": "$EVTPART1"}\
@@ -31,8 +31,7 @@ attr DEVICE setList\
   x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/control $payload)}
 attr DEVICE model sonos2mqtt_speaker
 attr DEVICE alias ALIAS
-
-setreading DEVICE attrTemplateVersion 20200717
+setreading DEVICE attrTemplateVersion 20200718
 #
 name:sonos2mqtt_speakCommand1
 {\
@@ -49,3 +48,29 @@ name:sonos2mqtt_speakCommand1
   fhem("attr $dev setList $newVal");\
   fhem("setreading $dev modelNumber $modelN");\
 }
+#
+name:sonos2mqtt_bridge_comfort1
+desc:The sonos2mqtt bridge including automated setup for speaker devices
+filter:TYPE=MQTT2_DEVICE
+order:M_01b
+set DEVICE attrTemplate sonos2mqtt_bridge
+define n_configSonos1 notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ sleep 1;;set $EVTPART1 attrTemplate sonos2mqtt_speaker;;set $EVTPART1 x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}
+define n_configSonos2 notify MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {\
+  use XML::Simple qw(:strict);;\
+  no warnings 'experimental::smartmatch';;\
+  my @tv = ("S14","S11");;\
+  my $url="http://$EVTPART1:1400";;\
+  my $xmltext = GetFileFromURL("$url/xml/device_description.xml");;\
+  my $ref = XMLin($xmltext, KeyAttr => { }, ForceArray => [ ]);;\
+  my $mn=$ref->{device}{modelNumber};;\
+  my $img=$ref->{device}{iconList}{icon}{url};;\
+  my $icon="Sonos2mqtt_icon-$mn";;\
+  my $setList=AttrVal($NAME,'setList','');;\
+  fhem("setreading $NAME modelNumber $mn");;\
+  fhem("\"wget -qO ./www/images/default/$icon.png $url$img\"");;\
+  fhem("attr $NAME icon $icon;;sleep 4 WI;;set WEB rereadicons");;\
+  if ($mn ~~ @tv) {$setList=~s/input:Queue \{/input:Queue,TV \{/};;\
+  $setList=~s/;;/;;;;/g;;\
+  fhem("attr $NAME setList $setList")\
+}
+setreading DEVICE attrTemplateVersion 20200727
