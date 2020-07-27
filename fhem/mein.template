@@ -54,23 +54,23 @@ desc:The sonos2mqtt bridge including automated setup for speaker devices
 filter:TYPE=MQTT2_DEVICE
 order:M_01b
 set DEVICE attrTemplate sonos2mqtt_bridge
-define n_configSonos1 notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ sleep 1;;set $EVTPART1 attrTemplate sonos2mqtt_speaker;;set $EVTPART1 x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}
+define n_configSonos1 notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ sleep 1;set $EVTPART1 attrTemplate sonos2mqtt_speaker;set $EVTPART1 x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}
 define n_configSonos2 notify MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {\
-  use XML::Simple qw(:strict);;\
-  no warnings 'experimental::smartmatch';;\
-  my @tv = ("S14","S11");;\
-  my $url="http://$EVTPART1:1400";;\
-  my $xmltext = GetFileFromURL("$url/xml/device_description.xml");;\
-  my $ref = XMLin($xmltext, KeyAttr => { }, ForceArray => [ ]);;\
-  my $mn=$ref->{device}{modelNumber};;\
-  my $img=$ref->{device}{iconList}{icon}{url};;\
-  my $icon="Sonos2mqtt_icon-$mn";;\
-  my $setList=AttrVal($NAME,'setList','');;\
-  fhem("setreading $NAME modelNumber $mn");;\
-  fhem("\"wget -qO ./www/images/default/$icon.png $url$img\"");;\
-  fhem("attr $NAME icon $icon;;sleep 4 WI;;set WEB rereadicons");;\
-  if ($mn ~~ @tv) {$setList=~s/input:Queue \{/input:Queue,TV \{/};;\
-  $setList=~s/;;/;;;;/g;;\
+  use XML::Simple qw(:strict);\
+  no warnings 'experimental::smartmatch';\
+  my @tv = ("S14","S11");\
+  my $url="http://$EVTPART1:1400";\
+  my $xmltext = GetFileFromURL("$url/xml/device_description.xml");\
+  my $ref = XMLin($xmltext, KeyAttr => { }, ForceArray => [ ]);\
+  my $mn=$ref->{device}{modelNumber};\
+  my $img=$ref->{device}{iconList}{icon}{url};\
+  my $icon="Sonos2mqtt_icon-$mn";\
+  my $setList=AttrVal($NAME,'setList','');\
+  fhem("setreading $NAME modelNumber $mn");\
+  fhem("\"wget -qO ./www/images/default/$icon.png $url$img\"");\
+  fhem("attr $NAME icon $icon;sleep 4 WI;set WEB rereadicons");\
+  if ($mn ~~ @tv) {$setList=~s/input:Queue \{/input:Queue,TV \{/};\
+  $setList=~s/;/;;/g;\
   fhem("attr $NAME setList $setList")\
 }
 setreading DEVICE attrTemplateVersion 20200727
