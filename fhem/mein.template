@@ -69,8 +69,8 @@ define n_configSonos2 notify MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {\
   fhem("setreading $NAME modelNumber $mn");\
   fhem("\"wget -qO ./www/images/default/$icon.png $url$img\"");\
   fhem("attr $NAME icon $icon;sleep 4 WI;set WEB rereadicons");\
-  if ($mn ~~ @tv) {$setList=~s/input:Queue \{/input:Queue,TV \{/};\
+  if (grep(/$mn/, @tv)) {$setList=~s/input:Queue \{/input:Queue,TV \{/};\
   $setList=~s/;/;;/g;\
   fhem("attr $NAME setList $setList")\
 }
-setreading DEVICE attrTemplateVersion 20200727
+setreading DEVICE attrTemplateVersion 20200801
