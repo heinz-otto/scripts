@@ -58,8 +58,7 @@ define n_configSonos1 notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ sleep 1;\
   set $EVTPART1 attrTemplate sonos2mqtt_speaker;\
   set $EVTPART1 x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}
 define n_configSonos2 notify MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {\
-  no warnings 'experimental::smartmatch';\
-  my @tv = ("S14","S11");\
+  my @tv = ("S14","S11","S9");\
   my $url="http://$EVTPART1:1400";\
   my $xmltext = GetFileFromURL("$url/xml/device_description.xml");\
   my ($mn)=$xmltext =~ /<modelNumber>(S[0-9]+)/;\
