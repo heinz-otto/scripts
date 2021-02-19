@@ -112,4 +112,19 @@ my $style2 ='background-repeat: no-repeat; background-size: contain; background-
      </tr>
   </table></div>"
 }
+
+sub sonos2mqtt_Add_attr
+{
+my ($devspec,$attr,$item) = @_;
+my @devlist = devspec2array($devspec);
+my ($first,$sec)=split(':',$item,2);
+$first=~s/^\s+//;
+foreach (@devlist) {
+   my @arr = grep {$_ !~ $first} split("\n",AttrVal($_,$attr,''));
+   push @arr,$item;
+   my $val = join "\n",@arr;
+   $val =~ s/;/;;/g;
+   fhem("attr $_ $attr $val")}
+}
+
 1;
