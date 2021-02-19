@@ -36,27 +36,19 @@ if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 my @test = ('stop','play','pause','toggle','volumeUp','volumeDown','next','previous');
 if (grep { $_ eq $cmd } @test) {return lc( qq(sonos/$uuid/control { "command": "$cmd" }) )}
 
-#if($cmd eq 'stop') {return qq(sonos/$uuid/control { "command": "stop" })}
-#if($cmd eq 'play') {return qq(sonos/$uuid/control { "command": "play" })}
-#if($cmd eq 'pause') {return qq(sonos/$uuid/control { "command": "pause" })}
-#if($cmd eq 'toggle') {return qq(sonos/$uuid/control { "command": "toggle" })}
-#if($cmd eq 'volumeUp') {return qq(sonos/$uuid/control { "command": "volumeup" })}
-#if($cmd eq 'volumeDown') {return qq(sonos/$uuid/control { "command": "volumedown" })}
-#if($cmd eq 'next') {return qq(sonos/$uuid/control { "command": "next" })}
-#if($cmd eq 'previous') {return qq(sonos/$uuid/control { "command": "previous" })}
-
 my %t=('volume'=>'volume','joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
 if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
 
-#if($cmd eq 'volume') {return qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
-#if($cmd eq 'joinGroup') {return qq(sonos/$uuid/control { "command": "joingroup", "input": "$payload"})}
-#if($cmd eq 'setAVTUri') {return qq(sonos/$uuid/control { "command": "setavtransporturi", "input": "$payload"})}
-
 if($cmd eq 'notify') {return qq(sonos/$uuid/control { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
 if($cmd eq 'x_raw_payload') {return qq(sonos/$uuid/control $payload)}
- 
+
+#%t=('true'=>'mute','false'=>'unmute');
+#if($cmd eq 'mute')   {return qq(sonos/$uuid/control { "command": "$t{$payload}" } )}
 if($cmd eq 'mute')   {$value = $payload eq "true" ? "mute" : "unmute"; return qq(sonos/$uuid/control { "command": "$value" } )}
+#%t=('TV'=>'tv','Line_In'=>'line','Queue'=>'queue');
+#if($cmd eq 'input')  {return qq(sonos/$uuid/control { "command": "switchto$t{$payload}" } ) }
 if($cmd eq 'input')  {$value = $payload eq "TV" ? "tv" : $payload eq "Line_In" ? "line" : "queue"; return qq(sonos/$uuid/control { "command": "switchto$value" } ) }
+
 if($cmd eq 'leaveGroup') {$value = ReadingsVal($uuid,"groupName","all"); return qq(sonos/$uuid/control { "command": "leavegroup",  "input": "$value" } ) }
 
 if($cmd eq 'playUri') {fhem("set $NAME setAVTUri $payload; sleep 1; set $NAME play")}
