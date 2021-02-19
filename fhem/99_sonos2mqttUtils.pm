@@ -1,7 +1,7 @@
 ##############################################
-# $Id: myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig $
-# from myUtilsTemplate.pm
-# 99_sonos2mqttUtils
+# $Id: 99_sonos2mqttUtils.pm 
+# from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig $
+# utils for sonos2mqtt Implementation
 # They are then available in every Perl expression.
 
 package main;
@@ -21,41 +21,39 @@ sub sonos2mqtt
 { 
 my ($NAME,$EVENT)=@_;
 my @arr = split(' ',$EVENT);
-my ($cmd,$vol,$text);
+my ($cmd,$vol,$text,$value);
 $cmd = $arr[0];
 
 if($cmd eq 'devStateIcon') {return sonos2mqtt_devStateIcon($NAME)}
 if($cmd eq 'sayText') { ($cmd,$text) = split(' ', $EVENT,2)}
 if($cmd eq 'speak') { ($cmd,$vol,$text) = split(' ', $EVENT,3)}
 my $tts = ReadingsVal('SonosBridge','tts','SonosTTS');
+my $uuid = ReadingsVal($NAME,'uuid','error');
 
 my $payload = $EVENT;
-my $ret;
-my $value;
-my $uuid = ReadingsVal($NAME,'uuid','error');
 if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 
-if($cmd eq 'mute')   {$value = $payload eq "true" ? "mute" : "unmute"; $ret = qq(sonos/$uuid/control { "command": "$value" } )}
-if($cmd eq 'input')  {$value = $payload eq "TV" ? "tv" : $payload eq "Line_In" ? "line" : "queue"; $ret = qq(sonos/$uuid/control { "command": "switchto$value" } ) }
-if($cmd eq 'leaveGroup') {$value = ReadingsVal($uuid,"groupName","all"); $ret = qq(sonos/$uuid/control { "command": "leavegroup",  "input": "$value" } ) }
-if($cmd eq 'playUri') {fhem("set $NAME setAVTUri $payload; sleep 1; set $NAME play")}
-
-if($cmd eq 'stop') {$ret = qq(sonos/$uuid/control { "command": "stop" })}
-if($cmd eq 'play') {$ret = qq(sonos/$uuid/control { "command": "play" })}
-if($cmd eq 'pause') {$ret = qq(sonos/$uuid/control { "command": "pause" })}
-if($cmd eq 'toggle') {$ret = qq(sonos/$uuid/control { "command": "toggle" })}
-if($cmd eq 'volumeUp') {$ret = qq(sonos/$uuid/control { "command": "volumeup" })}
-if($cmd eq 'volumeDown') {$ret = qq(sonos/$uuid/control { "command": "volumedown" })}
-if($cmd eq 'next') {$ret = qq(sonos/$uuid/control { "command": "next" })}
-if($cmd eq 'previous') {$ret = qq(sonos/$uuid/control { "command": "previous" })}
-if($cmd eq 'volume') {$ret = qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
-if($cmd eq 'joinGroup') {$ret = qq(sonos/$uuid/control { "command": "joingroup",  "input": "$payload"})}
-if($cmd eq 'setAVTUri') {$ret = qq(sonos/$uuid/control { "command": "setavtransporturi",  "input": "$payload"})}
-if($cmd eq 'notify') {$ret = qq(sonos/$uuid/control { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
-if($cmd eq 'x_raw_payload') {$ret = qq(sonos/$uuid/control $payload)}
+if($cmd eq 'stop') {return qq(sonos/$uuid/control { "command": "stop" })}
+if($cmd eq 'play') {return qq(sonos/$uuid/control { "command": "play" })}
+if($cmd eq 'pause') {return qq(sonos/$uuid/control { "command": "pause" })}
+if($cmd eq 'toggle') {return qq(sonos/$uuid/control { "command": "toggle" })}
+if($cmd eq 'volumeUp') {return qq(sonos/$uuid/control { "command": "volumeup" })}
+if($cmd eq 'volumeDown') {return qq(sonos/$uuid/control { "command": "volumedown" })}
+if($cmd eq 'next') {return qq(sonos/$uuid/control { "command": "next" })}
+if($cmd eq 'previous') {return qq(sonos/$uuid/control { "command": "previous" })}
+if($cmd eq 'volume') {return qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
+if($cmd eq 'joinGroup') {return qq(sonos/$uuid/control { "command": "joingroup",  "input": "$payload"})}
+if($cmd eq 'setAVTUri') {return qq(sonos/$uuid/control { "command": "setavtransporturi",  "input": "$payload"})}
+if($cmd eq 'notify') {return qq(sonos/$uuid/control { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
+if($cmd eq 'x_raw_payload') {return qq(sonos/$uuid/control $payload)}
  
-if($cmd eq 'sayText') { fhem("setreading $tts text ".ReadingsVal($tts,'text',' ').' '.$text.";sleep 0.4 tts;set $tts tts [$tts:text];sleep $tts:playing:.0 ;set $NAME notify [$tts:vol] [$tts:httpName];deletereading $tts text")}
-if($cmd eq 'speak') { fhem("set $tts tts $text;sleep $tts:playing:.0 ;set $NAME notify $vol [$tts:httpName]")}
+if($cmd eq 'mute')   {$value = $payload eq "true" ? "mute" : "unmute"; return qq(sonos/$uuid/control { "command": "$value" } )}
+if($cmd eq 'input')  {$value = $payload eq "TV" ? "tv" : $payload eq "Line_In" ? "line" : "queue"; return qq(sonos/$uuid/control { "command": "switchto$value" } ) }
+if($cmd eq 'leaveGroup') {$value = ReadingsVal($uuid,"groupName","all"); return qq(sonos/$uuid/control { "command": "leavegroup",  "input": "$value" } ) }
+
+if($cmd eq 'playUri') {fhem("set $NAME setAVTUri $payload; sleep 1; set $NAME play")}
+if($cmd eq 'sayText') {fhem("setreading $tts text ".ReadingsVal($tts,'text',' ').' '.$text.";sleep 0.4 tts;set $tts tts [$tts:text];sleep $tts:playing:.0 ;set $NAME notify [$tts:vol] [$tts:httpName];deletereading $tts text")}
+if($cmd eq 'speak') {fhem("set $tts tts $text;sleep $tts:playing:.0 ;set $NAME notify $vol [$tts:httpName]")}
 if($cmd eq 'playFav') {
 	use JSON;use HTML::Entities;use Encode qw(encode decode);
 	my $enc = 'UTF8';my $uri='';my $search=(split(' ', $EVENT,2))[1];
@@ -71,7 +69,7 @@ if($cmd eq 'playFav') {
 
 if($cmd eq 'test') {Log 1, "Das Device $NAME hat ausgeloest, die uuid ist >$uuid< der Befehl war >$cmd< der Teil danach sah so aus: $payload"}
 
-return $ret;
+return undef;
 }
 #######
 sub sonos2mqtt_devStateIcon
@@ -107,7 +105,7 @@ if ($isMaster and $mystate eq 'PLAYING') {$line2 = $Input =~ /LineIn|TV/ ? $Inpu
     elsif ($inGroup and !$isMaster or $inCouple) {$line2 .= $inCouple ? "Stereopaar":"Steuerung: $master"}
 my $style = 'display:inline-block;margin-right:5px;border:1px solid lightgray;height:4.00em;width:4.00em;background-size:contain;background-image:';
 my $style2 ='background-repeat: no-repeat; background-size: contain; background-position: center center';
-return "<div><table>
+"<div><table>
      <tr>
        <td><div style='$style url($cover);$style2'></div></td>
        <td>$linePic<br><div>$line2</div></td>
