@@ -46,7 +46,7 @@ if (grep { $_ eq $cmd } @test) {return lc( qq(sonos/$uuid/control { "command": "
 #if($cmd eq 'previous') {return qq(sonos/$uuid/control { "command": "previous" })}
 
 my %t=('volume'=>'volume','joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
-if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": $payload })}
+if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
 
 #if($cmd eq 'volume') {return qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
 #if($cmd eq 'joinGroup') {return qq(sonos/$uuid/control { "command": "joingroup", "input": "$payload"})}
