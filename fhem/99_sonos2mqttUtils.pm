@@ -24,6 +24,7 @@ my @arr = split(' ',$EVENT);
 my ($cmd,$vol,$text);
 $cmd = $arr[0];
 
+if($cmd eq 'devStateIcon') {return sonos2mqtt_devStateIcon($NAME)}
 if($cmd eq 'sayText') { ($cmd,$text) = split(' ', $EVENT,2)}
 if($cmd eq 'speak') { ($cmd,$vol,$text) = split(' ', $EVENT,3)}
 my $tts = ReadingsVal('SonosBridge','tts','SonosTTS');
