@@ -36,8 +36,13 @@ if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 my @test = ('stop','play','pause','toggle','volumeUp','volumeDown','next','previous');
 if (grep { $_ eq $cmd } @test) {return lc( qq(sonos/$uuid/control { "command": "$cmd" }) )}
 
-my %t=('volume'=>'volume','joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
-if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
+if($cmd eq 'volume') {$ret = qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
+
+#my %t=('joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
+#if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
+
+if($cmd eq 'joinGroup') {$ret = qq(sonos/$uuid/control { "command": "joingroup",  "input": "$payload"})}
+if($cmd eq 'setAVTUri') {$ret = qq(sonos/$uuid/control { "command": "setavtransporturi",  "input": "$payload"})}
 
 if($cmd eq 'notify') {return qq(sonos/$uuid/control { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
 if($cmd eq 'x_raw_payload') {return qq(sonos/$uuid/control $payload)}
