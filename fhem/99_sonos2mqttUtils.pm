@@ -25,24 +25,25 @@ my ($cmd,$vol,$text,$value);
 $cmd = $arr[0];
 
 if($cmd eq 'devStateIcon') {return sonos2mqtt_devStateIcon($NAME)}
+
+my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
+my $tts = ReadingsVal($bridge,'tts','SonosTTS');
 if($cmd eq 'sayText') { ($cmd,$text) = split(' ', $EVENT,2)}
 if($cmd eq 'speak') { ($cmd,$vol,$text) = split(' ', $EVENT,3)}
-my $tts = ReadingsVal('SonosBridge','tts','SonosTTS');
 my $uuid = ReadingsVal($NAME,'uuid','error');
-
+my $topic = "sonos/$uuid/control";
 my $payload = $EVENT;
 if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 
-my @test = ('stop','play','pause','toggle','volumeUp','volumeDown','next','previous');
-if (grep { $_ eq $cmd } @test) {return lc( qq(sonos/$uuid/control { "command": "$cmd" }) )}
+my @easycmd = ('stop','play','pause','toggle','volumeUp','volumeDown','next','previous');
+if (grep { $_ eq $cmd } @easycmd) {return lc( qq($topic { "command": "$cmd" }) )}
 
 if($cmd eq 'volume') {return qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
-
-#my %t=('joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
-#if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
-
 if($cmd eq 'joinGroup') {return qq(sonos/$uuid/control { "command": "joingroup",  "input": "$payload"})}
 if($cmd eq 'setAVTUri') {return qq(sonos/$uuid/control { "command": "setavtransporturi",  "input": "$payload"})}
+# alternativ code for the last two lines
+#my %t=('joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
+#if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
 
 if($cmd eq 'notify') {return qq(sonos/$uuid/control { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
 if($cmd eq 'x_raw_payload') {return qq(sonos/$uuid/control $payload)}
