@@ -158,12 +158,34 @@ sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.Readings
 sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
 }
 
-#define n_configSonosTest notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ {sonos2mqtt_nty($NAME,$EVENT)}
+# delete n_configSonos.
+# define n_configSonosTest notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ {sonos2mqtt_nty($NAME,$EVENT)}
+# defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
 sub sonos2mqtt_nty
 {
 my ($NAME,$EVENT)=@_;
 my @arr = split(' ',$EVENT);
-{Log 1, "Das Device $NAME hat ausgeloest, die der EVENT >$EVENT<"}
+# {Log 1, "Das Device $NAME hat ausgeloest, die der EVENT >$EVENT<"}
+if ($NAME eq 'global'){
+   fhem('sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}')
+   }
+ else{
+      my @tv = ("S14","S11","S9");
+      my @line = ("S5","Z90","ZP120");
+      my $url="http://$arr[1]:1400";
+      my $xmltext = GetFileFromURL("$url/xml/device_description.xml");
+      my ($mn)=$xmltext =~ /<modelNumber>([SZ]P?[0-9]{1,3})/;
+      my ($img)=$xmltext =~ /<url>(.*)<\/url>/;
+      my $icon="Sonos2mqtt_icon-$mn";
+      my $setList=AttrVal($NAME,'setList','');
+      fhem("setreading $NAME modelNumber $mn");
+      fhem("\"wget -qO ./www/images/default/$icon.png $url$img\"");
+      fhem("attr $NAME icon $icon;sleep 4 WI;set WEB rereadicons");
+      if (grep(/$mn/, @tv)) {$setList=~s/input:Queue \{/input:Queue,TV \{/};
+      if (grep(/$mn/, @line)) {$setList=~s/input:Queue \{/input:Queue,Line_In \{/};
+      $setList=~s/;/;;/g;
+      fhem("attr $NAME setList $setList");
+   }
 }
 
 1;
