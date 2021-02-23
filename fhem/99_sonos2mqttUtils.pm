@@ -151,12 +151,12 @@ my @tv = ("S14","S11","S9");
 my @line = ("S5","Z90","ZP120");
 for (devspec2array($devspec)) {
     my $mn = ReadingsVal($_,'modelNumber','');
-    fhem("set $devspec volume ".ReadingsVal($_,'volume','10'));
+    fhem("set $_ volume ".ReadingsVal($_,'volume','10')); # trick to initiate the userReadings 
     if (grep(/$mn/, @tv)) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
     if (grep(/$mn/, @line)) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
+    sonos2mqtt_mod_list($_,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
+    sonos2mqtt_mod_list($_,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
   }
-sonos2mqtt_mod_list($devspec,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
-sonos2mqtt_mod_list($devspec,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
 }
 
 # delete n_configSonos.
