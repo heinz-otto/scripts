@@ -137,53 +137,49 @@ foreach (@devlist) {
 
 sub sonos2mqtt_setup
 {
+my $devspec = shift @_ // 'a:model=sonos2mqtt_speaker';
 my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
-fhem(q(attr a:model=sonos2mqtt_speaker devStateIcon {sonos2mqtt($name,'devStateIcon')}));
+fhem("attr $devspec".q( devStateIcon {sonos2mqtt($name,'devStateIcon')}));
 sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply');
 for ('stop:noArg','play:noArg','pause:noArg','toggle:noArg','volumeUp:noArg','volumeDown:noArg','volume:slider,0,1,100',
      'mute:true,false','next:noArg','previous:noArg','leaveGroup:noArg','setAVTUri:textField','playUri:textField',
      'notify:textField','x_raw_payload:textField','sayText:textField','speak:textField','input:Queue') {
-           sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList',$_.q( {sonos2mqtt($NAME,$EVENT)}));
+           sonos2mqtt_mod_list($devspec,'setList',$_.q( {sonos2mqtt($NAME,$EVENT)}));
     }
 
 my @tv = ("S14","S11","S9");
 my @line = ("S5","Z90","ZP120");
-for (devspec2array('a:model=sonos2mqtt_speaker')) {
+for (devspec2array($devspec)) {
     my $mn = ReadingsVal($_,'modelNumber','');
     if (grep(/$mn/, @tv)) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
     if (grep(/$mn/, @line)) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
   }
 
-sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
-sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
+sonos2mqtt_mod_list($devspec,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
+sonos2mqtt_mod_list($devspec,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
 }
 
 # delete n_configSonos.
 # defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
+# for Test use "test $EVENT"
 sub sonos2mqtt_nty
 {
-my ($NAME,$EVENT)=@_;
+my ($NAME,$EVENT) = @_;
 my @arr = split(' ',$EVENT);
 if ($arr[0] eq 'test') {Log 1, "Device $NAME, EVENT >$EVENT<";shift @arr}
 if ($NAME eq 'global'){
-   fhem(qq(sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}))
+      fhem(qq(sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}))
    }
  else{
-      my @tv = ("S14","S11","S9");
-      my @line = ("S5","Z90","ZP120");
       my $url="http://$arr[1]:1400";
       my $xmltext = GetFileFromURL("$url/xml/device_description.xml");
       my ($mn)=$xmltext =~ /<modelNumber>([SZ]P?[0-9]{1,3})/;
       my ($img)=$xmltext =~ /<url>(.*)<\/url>/;
       my $icon="Sonos2mqtt_icon-$mn";
-      my $setList=AttrVal($NAME,'setList','');
       fhem("setreading $NAME modelNumber $mn");
       fhem("\"wget -qO ./www/images/default/$icon.png $url$img\"");
       fhem("attr $NAME icon $icon;sleep 4 WI;set WEB rereadicons");
-      if (grep(/$mn/, @tv)) {$setList=~s/input:Queue \{/input:Queue,TV \{/};
-      if (grep(/$mn/, @line)) {$setList=~s/input:Queue \{/input:Queue,Line_In \{/};
-      $setList=~s/;/;;/g;
-      fhem("attr $NAME setList $setList");
+      sonos2mqtt_setup($NAME);
    }
 }
 
