@@ -159,13 +159,12 @@ sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVa
 }
 
 # delete n_configSonos.
-# define n_configSonosTest notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ {sonos2mqtt_nty($NAME,$EVENT)}
 # defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
 sub sonos2mqtt_nty
 {
 my ($NAME,$EVENT)=@_;
 my @arr = split(' ',$EVENT);
-# {Log 1, "Das Device $NAME hat ausgeloest, die der EVENT >$EVENT<"}
+if ($arr[0] eq 'test') {Log 1, "Device $NAME, EVENT >$EVENT<";shift @arr}
 if ($NAME eq 'global'){
    fhem(qq(sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}))
    }
