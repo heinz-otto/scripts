@@ -154,9 +154,9 @@ for (devspec2array($devspec)) {
     if (grep(/$mn/, @tv)) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
     if (grep(/$mn/, @line)) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
   }
-
 sonos2mqtt_mod_list($devspec,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
 sonos2mqtt_mod_list($devspec,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
+fhem("set $devspec volume {(ReadingsVal(\$DEV,'volume',''))}");
 }
 
 # delete n_configSonos.
