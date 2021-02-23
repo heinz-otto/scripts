@@ -119,7 +119,9 @@ my $style2 ='background-repeat: no-repeat; background-size: contain; background-
   </table></div>"
 }
 
-sub sonos2mqtt_Add_attr
+# usage sonos2mqtt_mod_list(devspec,attrName,line)
+# usage {sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply')}
+sub sonos2mqtt_mod_list
 {
 my ($devspec,$attr,$item) = @_;
 my @devlist = devspec2array($devspec);
@@ -131,6 +133,17 @@ foreach (@devlist) {
    my $val = join "\n",@arr;
    $val =~ s/;/;;/g;
    fhem("attr $_ $attr $val")}
+}
+
+sub sonos2mqtt_setup
+{
+my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
+fhem(q(attr a:model=sonos2mqtt_speaker devStateIcon {sonos2mqtt($name,'devStateIcon')}));
+sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply');
+sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','stop:noArg {sonos2mqtt($NAME,$EVENT)}');
+sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','sayText:textField {sonos2mqtt($NAME,$EVENT)}');
+sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
+sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
 }
 
 1;
