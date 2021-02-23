@@ -140,8 +140,18 @@ sub sonos2mqtt_setup
 my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
 fhem(q(attr a:model=sonos2mqtt_speaker devStateIcon {sonos2mqtt($name,'devStateIcon')}));
 sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply');
-sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','stop:noArg {sonos2mqtt($NAME,$EVENT)}');
-sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','sayText:textField {sonos2mqtt($NAME,$EVENT)}');
+for ('stop:noArg','play:noArg','pause:noArg','toggle:noArg','volumeUp:noArg','volumeDown:noArg','volume:slider,0,1,100','mute:true,false'.'next:noArg','previous:noArg','leaveGroup:noArg','setAVTUri:textField','playUri:textField','notify:textField','x_raw_payload:textField','sayText:textField','speak:textField','input:Queue') {
+    sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList',$_.q( {sonos2mqtt($NAME,$EVENT)}));
+  }
+
+my @tv = ("S14","S11","S9");
+my @line = ("S5","Z90","ZP120");
+for (devspec2array('a:model=sonos2mqtt_speaker')) {
+    my $mn = ReadingsVal($_,'modelNumber','');
+    if (grep(/$mn/, @tv)) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
+    if (grep(/$mn/, @line)) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
+  }
+
 sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
 sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
 }
