@@ -158,5 +158,12 @@ sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.Readings
 sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
 }
 
+#define n_configSonosTest notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+ {sonos2mqtt_nty($NAME,$EVENT)}
+sub sonos2mqtt_nty
+{
+my ($NAME,$EVENT)=@_;
+my @arr = split(' ',$EVENT);
+{Log 1, "Das Device $NAME hat ausgeloest, die der EVENT >$EVENT<"}
+}
 
 1;
