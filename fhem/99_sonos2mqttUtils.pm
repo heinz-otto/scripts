@@ -167,7 +167,7 @@ my ($NAME,$EVENT)=@_;
 my @arr = split(' ',$EVENT);
 # {Log 1, "Das Device $NAME hat ausgeloest, die der EVENT >$EVENT<"}
 if ($NAME eq 'global'){
-   fhem('sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}')
+   fhem(qq(sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}))
    }
  else{
       my @tv = ("S14","S11","S9");
