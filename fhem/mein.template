@@ -26,8 +26,7 @@ order:M_05c
 set DEVICE attrTemplate sonos2mqtt_bridge
 attr DEVICE setList PauseAll:noArg sonos/cmd/pauseall\
 CheckSubscription:noArg sonos/cmd/check-subscriptions
-attr SonosBridge userReadings \
-favlist:Favorites.* {\
+attr SonosBridge userReadings favlist:Favorites.* {\
   use JSON;use HTML::Entities;use Encode qw(encode decode);\
   my $enc = 'UTF8';\
   my @out;\
