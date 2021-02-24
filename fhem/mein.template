@@ -64,6 +64,8 @@ attr DEVICE stateFormat transportState
 attr DEVICE readingList\
   BASE_TOPIC/DEV_ID:.* { json2nameValue($EVENT,'',$JSONMAP) }
   BASE_TOPIC/DEV_ID/ZoneInfo:.* { json2nameValue($EVENT) }
+attr DEVICE setList\
+  x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/control $payload)}
 attr DEVICE alias ALIAS
 attr DEVICE model sonos2mqtt_speaker
 attr DEVICE userReadings Master:groupName.* {(split(' +',ReadingsVal($name,'groupName','')))[0]},\
