@@ -1,3 +1,24 @@
+# sonos2mqtt
+# The sonos2mqtt bridge device (entire hex id of devices as bridgeRegexp)
+name:sonos2mqtt_bridge
+desc:The sonos2mqtt bridge device
+filter:TYPE=MQTT2_DEVICE
+order:M_05
+par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^/:]+)[/].+, ? $1 : undef }
+par:ICON;ICON as set, defaults to mqtt_bridge_2;{ AttrVal("DEVICE","icon","mqtt_bridge_2") }
+attr DEVICE icon ICON
+attr DEVICE bridgeRegexp\
+  BASE_TOPIC/(RINCON_[A-Z0-9]+)[:/].* "$1"
+attr DEVICE readingList\
+  BASE_TOPIC/connected:.* connected\
+  homeassistant/music_player/RINCON_([0-9A-Z]+)/sonos/config:.* { $TOPIC =~ m,(RINCON_[0-9A-Z]+),; { "config_$1"=>$EVENT }}\
+  BASE_TOPIC/status/[^/]+/avtransport:.* {}\
+  BASE_TOPIC/status/[^/]+/renderingcontrol:.* {}
+attr DEVICE model sonos2mqtt_bridge
+attr DEVICE devStateIcon 0:10px-kreis-rot 1:10px-kreis-gelb 2:10px-kreis-gruen
+attr DEVICE stateFormat connected
+setreading DEVICE attrTemplateVersion 20200729
+
 name:sonos2mqtt_bridge_comfort
 desc:The sonos2mqtt bridge including automated setup for speaker devices (adds 1 notify devices)
 filter:TYPE=MQTT2_DEVICE
