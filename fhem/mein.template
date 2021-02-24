@@ -26,6 +26,22 @@ order:M_05c
 set DEVICE attrTemplate sonos2mqtt_bridge
 attr DEVICE setList PauseAll:noArg sonos/cmd/pauseall\
 CheckSubscription:noArg sonos/cmd/check-subscriptions
+attr SonosBridge userReadings favlist:Favorites.* {use JSON;use HTML::Entities;use Encode qw(encode decode);\
+ my $enc = 'UTF8';\
+ my @out;\
+ my $decoded = decode_json(ReadingsVal($name,'Favorites',''));\
+ my @arr  = @{$decoded->{'Result'}};;\
+ foreach (@arr) {\
+   my $dec = encode($enc, decode_entities($_->{'Title'}));\
+   $dec =~ s/\s/./g;\
+   push @out,$dec}\
+ return join ',', sort @out},\
+ grouplist:Favorites.* {my @out;\
+ foreach (devspec2array('a:model=sonos2mqtt_speaker')) {if (ReadingsVal($_,'isMaster','')) {push @out,ReadingsVal($_,'name','')}}\
+ return join(',', sort @out)}
+{sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Favorites:.* Favorites')}
+{sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply')}
+  
 defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
 
 setreading DEVICE attrTemplateVersion 20210225
