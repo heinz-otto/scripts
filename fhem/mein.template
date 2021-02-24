@@ -4,8 +4,7 @@ name:sonos2mqtt_bridge
 desc:The sonos2mqtt bridge device
 filter:TYPE=MQTT2_DEVICE
 order:M_05
-par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;\
-    { AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^/:]+)[/].+, ? $1 : 'sonos' }
+par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^/:]+)[/].+, ? $1 : 'sonos' }
 par:ICON;ICON as set, defaults to mqtt_bridge_2;{ AttrVal("DEVICE","icon","mqtt_bridge_2") }
 attr DEVICE icon ICON
 attr DEVICE bridgeRegexp\
@@ -54,8 +53,7 @@ name:sonos2mqtt_speaker
 desc:A basic sonos2mqtt speaker device
 filter:TYPE=MQTT2_DEVICE
 order:M_05b
-par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;\
-{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
+par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
 par:DEV_ID;techname of the device ;{ AttrVal("DEVICE","readingList","") =~ m,[^\/]+[\/](RINCON_[0-9A-Z]+):.*, ? $1 : undef }
 par:ALIAS;friendly name as set in sonos gadget itself;{ ReadingsVal("DEVICE","name","unknown") }
 par:DEVNAME;friendly name, used for topic in lowercase;{ lc(ReadingsVal("DEVICE","name","unknown")) }
