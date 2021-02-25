@@ -25,9 +25,10 @@ filter:TYPE=MQTT2_DEVICE
 order:M_05c
 { Svn_GetFile("contrib/AttrTemplate/99_sonos2mqttUtils.pm", "FHEM/99_sonos2mqttUtils.pm", sub(){ CommandReload(undef, "99_sonos2mqttUtils") }) }
 set DEVICE attrTemplate sonos2mqtt_bridge
+attr DEVICE getList Favorites:noArg Favorites {q(sonos/).ReadingsVal((devspec2array('a:model=sonos2mqtt_speaker'))[0],'uuid','').q(/control  {"command": "adv-command","input": {"cmd": "GetFavorites","reply": "Favorites"}})}
 attr DEVICE setList PauseAll:noArg sonos/cmd/pauseall\
 CheckSubscription:noArg sonos/cmd/check-subscriptions\
-setplayFav:noArg {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal('SonosBridge','favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
+setplayFav:noArg {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($NAME,'favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
 attr SonosBridge userReadings favlist:Favorites.* {\
   use JSON;use HTML::Entities;use Encode qw(encode decode);\
   my $enc = 'UTF8';\
