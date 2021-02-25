@@ -29,6 +29,7 @@ attr DEVICE getList Favorites:noArg Favorites {q(sonos/).ReadingsVal((devspec2ar
 attr DEVICE setList PauseAll:noArg sonos/cmd/pauseall\
 CheckSubscription:noArg sonos/cmd/check-subscriptions\
 setplayFav:noArg {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($NAME,'favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
+setjoinGroup:noArg {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($NAME,'grouplist','').' {sonos2mqtt($NAME,$EVENT)}')}
 attr SonosBridge userReadings favlist:Favorites.* {\
   use JSON;use HTML::Entities;use Encode qw(encode decode);\
   my $enc = 'UTF8';\
