@@ -23,6 +23,7 @@ name:sonos2mqtt_bridge_comfort
 desc:The sonos2mqtt bridge including automated setup for speaker devices (adds 1 notify devices)
 filter:TYPE=MQTT2_DEVICE
 order:M_05c
+{ Svn_GetFile("contrib/AttrTemplate/99_sonos2mqttUtils.pm", "FHEM/99_sonos2mqttUtils.pm", sub(){ CommandReload(undef, "99_sonos2mqttUtils") }) }
 set DEVICE attrTemplate sonos2mqtt_bridge
 attr DEVICE setList PauseAll:noArg sonos/cmd/pauseall\
 CheckSubscription:noArg sonos/cmd/check-subscriptions
