@@ -4,7 +4,7 @@ name:sonos2mqtt_bridge
 desc:The sonos2mqtt bridge device
 filter:TYPE=MQTT2_DEVICE
 order:M_05
-par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^/:]+)[/].+, ? $1 : 'sonos' }
+par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",'sonos') }
 par:ICON;ICON as set, defaults to mqtt_bridge_2;{ AttrVal("DEVICE","icon","mqtt_bridge_2") }
 attr DEVICE icon ICON
 attr DEVICE bridgeRegexp\
@@ -17,6 +17,7 @@ attr DEVICE readingList\
 attr DEVICE model sonos2mqtt_bridge
 attr DEVICE devStateIcon 0:10px-kreis-rot 1:10px-kreis-gelb 2:10px-kreis-gruen
 attr DEVICE stateFormat connected
+attr DEVICE devicetopic BASE_TOPIC
 setreading DEVICE attrTemplateVersion 20200729
 
 name:sonos2mqtt_bridge_comfort
