@@ -140,7 +140,7 @@ sub sonos2mqtt_setup
 my $devspec = shift @_ // 'a:model=sonos2mqtt_speaker';
 my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
 fhem("attr $devspec".q( devStateIcon {sonos2mqtt($name,'devStateIcon')}));
-sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply');
+#sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply');
 for ('stop:noArg','play:noArg','pause:noArg','toggle:noArg','volume:slider,0,1,100','volumeUp:noArg','volumeDown:noArg',
      'mute:true,false','next:noArg','previous:noArg','leaveGroup:noArg','setAVTUri:textField','playUri:textField',
      'notify:textField','x_raw_payload:textField','sayText:textField','speak:textField','input:Queue') {
@@ -154,8 +154,8 @@ for (devspec2array($devspec)) {
     fhem("set $_ volume ".ReadingsVal($_,'volume','10')); # trick to initiate the userReadings 
     if (grep(/$mn/, @tv)) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
     if (grep(/$mn/, @line)) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
-    sonos2mqtt_mod_list($_,'setList','joinGroup:'.ReadingsVal("$bridge",'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
-    sonos2mqtt_mod_list($_,'setList','playFav:'.ReadingsVal("$bridge",'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
+    sonos2mqtt_mod_list($_,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
+    sonos2mqtt_mod_list($_,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
   }
 }
 
@@ -181,6 +181,21 @@ if ($NAME eq 'global'){
       fhem("attr $NAME icon $icon;sleep 4 WI;set WEB rereadicons");
       sonos2mqtt_setup($NAME);
    }
+}
+
+# setplayFav, setjoinGroup not working well from inside setList Bridge
+# from commandline could used like {sonos2mqtt_bridge('SonosBridge','setplayFav')}
+# joinGroup does'nt working with spaces in "Player Rooms"
+sub sonos2mqtt_bridge
+{
+my ($NAME,$EVENT)=@_;
+my @arr = split(' ',$EVENT);
+my $cmd = $arr[0];
+
+if($cmd eq 'Favorites') {return q(sonos/).ReadingsVal((devspec2array('a:model=sonos2mqtt_speaker'))[0],'uuid','').q(/control {"command": "adv-command","input": {"cmd": "GetFavorites","reply": "Favorites"}})}
+if($cmd eq 'setplayFav') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($NAME,'favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
+if($cmd eq 'setjoinGroup') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($NAME,'grouplist','').' {sonos2mqtt($NAME,$EVENT)}')}
+return undef
 }
 
 1;
