@@ -26,9 +26,9 @@ filter:TYPE=MQTT2_DEVICE
 order:M_05c
 { Svn_GetFile("contrib/AttrTemplate/99_sonos2mqttUtils.pm", "FHEM/99_sonos2mqttUtils.pm", sub(){ CommandReload(undef, "99_sonos2mqttUtils") }) }
 set DEVICE attrTemplate sonos2mqtt_bridge
-attr DEVICE getList Favorites:noArg Favorites {sonos2mqtt_bridge($NAME,$EVENT)}
-attr DEVICE setList PauseAll:noArg sonos/cmd/pauseall\
-CheckSubscription:noArg sonos/cmd/check-subscriptions
+attr DEVICE getList Favorites:noArg Favorites {sonos2mqtt($NAME,$EVENT)}
+attr DEVICE setList PauseAll:noArg $\DEVICETOPIC/cmd/pauseall\
+CheckSubscription:noArg $\DEVICETOPIC/cmd/check-subscriptions
 attr SonosBridge userReadings favlist:Favorites.* {\
   use JSON;use HTML::Entities;use Encode qw(encode decode);\
   my $enc = 'UTF8';\
@@ -44,12 +44,12 @@ grouplist:Favorites.* {\
      my @out;\
      foreach (devspec2array('a:model=sonos2mqtt_speaker')) {if (ReadingsVal($_,'isMaster','')) {push @out,ReadingsVal($_,'name','')}}\
   return join(',', sort @out)}
-{sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Favorites:.* Favorites')}
-{sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply')}
+{sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList',$\DEVICETOPIC.'/RINCON_([0-9A-Z]+)/Favorites:.* Favorites')}
+{sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList',$\DEVICETOPIC.'/RINCON_([0-9A-Z]+)/Reply:.* Reply')}
   
 defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
 
-setreading DEVICE attrTemplateVersion 20210225
+setreading DEVICE attrTemplateVersion 20210301
 
 name:sonos2mqtt_speaker
 desc:A basic sonos2mqtt speaker device
@@ -64,13 +64,14 @@ attr DEVICE icon ICON
 attr DEVICE jsonMap volume_Master:volume mute_Master:mute
 attr DEVICE stateFormat transportState
 attr DEVICE readingList\
-  BASE_TOPIC/DEV_ID:.* { json2nameValue($EVENT,'',$JSONMAP) }
-  BASE_TOPIC/DEV_ID/ZoneInfo:.* { json2nameValue($EVENT) }
+  $\DEVICETOPIC/DEV_ID:.* { json2nameValue($EVENT,'',$JSONMAP) }
+  $\DEVICETOPIC/DEV_ID/ZoneInfo:.* { json2nameValue($EVENT) }
 attr DEVICE setList\
   x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq(BASE_TOPIC/DEV_ID/control $payload)}
 attr DEVICE devStateIcon (STOPPED|PAUSED_PLAYBACK):rc_PLAY:toggle PLAYING:rc_PAUSE:pause .*:refresh:play
 attr DEVICE alias ALIAS
 attr DEVICE model sonos2mqtt_speaker
+attr DEVICE devicetopic BASE_TOPIC
 attr DEVICE userReadings Master:groupName.* {(split(' +',ReadingsVal($name,'groupName','')))[0]},\
 isMaster:coordinatorUuid.* {ReadingsVal($name,'coordinatorUuid','') eq ReadingsVal($name,'uuid','')?1:0},\
 inGroup:groupName.* {ReadingsVal($name,'groupName','') =~ / \+ /?1:0},\
@@ -80,4 +81,4 @@ Input:currentTrack_TrackUri.* {my $currentTrack_TrackUri = ReadingsVal($name,'cu
       ? 'LineIn': $currentTrack_TrackUri =~ 'spdif'\
       ? 'TV'    : ReadingsVal($name,'enqueuedMetadata_UpnpClass','') eq 'object.item.audioItem.audioBroadcast'\
       ? 'Radio' : 'Playlist'}
-setreading DEVICE attrTemplateVersion 20210220
+setreading DEVICE attrTemplateVersion 20210301
