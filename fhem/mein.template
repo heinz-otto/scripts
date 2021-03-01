@@ -1,7 +1,7 @@
 # sonos2mqtt
 # The sonos2mqtt bridge device (entire hex id of devices as bridgeRegexp)
 name:sonos2mqtt_bridge
-desc:The sonos2mqtt bridge device
+desc:The sonos2mqtt bridge device, Forum #111711 and Wiki 
 filter:TYPE=MQTT2_DEVICE
 order:M_05
 par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",'sonos') }
@@ -18,10 +18,10 @@ attr DEVICE model sonos2mqtt_bridge
 attr DEVICE devStateIcon 0:10px-kreis-rot 1:10px-kreis-gelb 2:10px-kreis-gruen
 attr DEVICE stateFormat connected
 attr DEVICE devicetopic BASE_TOPIC
-setreading DEVICE attrTemplateVersion 20200729
+setreading DEVICE attrTemplateVersion 20210301
 
 name:sonos2mqtt_bridge_comfort
-desc:The sonos2mqtt bridge including automated setup for speaker devices (adds 1 notify devices)
+desc:The sonos2mqtt bridge adds 1 notify device for setup speakers, Forum #111711 and Wiki 
 filter:TYPE=MQTT2_DEVICE
 order:M_05c
 { Svn_GetFile("contrib/AttrTemplate/99_sonos2mqttUtils.pm", "FHEM/99_sonos2mqttUtils.pm", sub(){ CommandReload(undef, "99_sonos2mqttUtils") }) }
@@ -46,13 +46,11 @@ grouplist:Favorites.* {\
   return join(',', sort @out)}
 {sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList',AttrVal("DEVICE","devicetopic",'sonos').'/RINCON_([0-9A-Z]+)/Favorites:.* Favorites')}
 {sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList',AttrVal("DEVICE","devicetopic",'sonos').'/RINCON_([0-9A-Z]+)/Reply:.* Reply')}
-  
 defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
-
 setreading DEVICE attrTemplateVersion 20210301
 
 name:sonos2mqtt_speaker
-desc:A basic sonos2mqtt speaker device
+desc:A basic sonos2mqtt speaker device, Forum #111711 and Wiki 
 filter:TYPE=MQTT2_DEVICE
 order:M_05b
 par:BASE_TOPIC;base topic set in configuration.yaml of the sonos2mqtt bridge;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[\b]?([^\/:]+)[\/].+, ? $1 : undef }
