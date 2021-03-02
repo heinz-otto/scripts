@@ -1,6 +1,6 @@
 ##############################################
 # $Id$
-# from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig $
+# from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for sonos2mqtt Implementation
 # They are then available in every Perl expression.
 
@@ -17,67 +17,94 @@ sonos2mqttUtils_Initialize($$)
 
 # Enter you functions below _this_ line.
 
+##### Responses for getList and setList commands
 sub sonos2mqtt
 { 
 my ($NAME,$EVENT)=@_;
 my @arr = split(' ',$EVENT);
 my ($cmd,$vol,$text,$value);
 $cmd = $arr[0];
-
+# quick response for devStateIcon
 if($cmd eq 'devStateIcon') {return sonos2mqtt_devStateIcon($NAME)}
 
 my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
+my $devicetopic = ReadingsVal($bridge,'devicetopic','sonos');
 my $tts = ReadingsVal($bridge,'tts','SonosTTS');
+# special cmds for the bridge
+if ($NAME eq $bridge){
+   if($cmd eq 'notifyall') {return qq($devicetopic/cmd/notify {"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700})}
+   if($cmd eq 'announcementall') {
+      ($cmd,$text) = split(' ', $EVENT,2);
+      fhem("setreading $tts text ".ReadingsVal($tts,'text',' ').' '.$text.";sleep 0.4 tts;set $tts tts [$tts:text];sleep $tts:playing:.0 ;set $NAME notifyall [$tts:vol] [$tts:httpName];deletereading $tts text");
+   }
+   if($cmd eq 'Favorites') {return "$devicetopic/".ReadingsVal((devspec2array('a:model=sonos2mqtt_speaker'))[0],'uuid','').q(/control {"command": "adv-command","input": {"cmd": "GetFavorites","reply": "Favorites"}})}
+   if($cmd eq 'setplayFav') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($NAME,'favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
+   if($cmd eq 'setjoinGroup') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($NAME,'grouplist','').' {sonos2mqtt($NAME,$EVENT)}')}
+   return undef
+}
+# from here cmds for speaker
 if($cmd eq 'sayText') { ($cmd,$text) = split(' ', $EVENT,2)}
-if($cmd eq 'speak') { ($cmd,$vol,$text) = split(' ', $EVENT,3)}
 my $uuid = ReadingsVal($NAME,'uuid','error');
-my $topic = "sonos/$uuid/control";
+my $topic = "$devicetopic/$uuid/control";
 my $payload = $EVENT;
 if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 
 my @easycmd = ('stop','play','pause','toggle','volumeUp','volumeDown','next','previous');
 if (grep { $_ eq $cmd } @easycmd) {return lc( qq($topic { "command": "$cmd" }) )}
 
-if($cmd eq 'volume') {return qq(sonos/$uuid/control { "command": "volume", "input": $payload })}
-if($cmd eq 'joinGroup') {return qq(sonos/$uuid/control { "command": "joingroup",  "input": "$payload"})}
-if($cmd eq 'setAVTUri') {return qq(sonos/$uuid/control { "command": "setavtransporturi",  "input": "$payload"})}
-# alternativ code for the last two lines
-#my %t=('joinGroup'=>'joingroup','setAVTUri'=>'setavtransporturi');
-#if (grep { $_ eq $cmd } %t) {return qq(sonos/$uuid/control { "command": "$t{$cmd}", "input": "$payload" })}
+if($cmd eq 'volume') {return qq($topic { "command": "volume", "input": $payload })}
+if($cmd eq 'joinGroup') {return qq($topic { "command": "joingroup",  "input": "$payload"})}
+if($cmd eq 'setAVTUri') {return qq($topic { "command": "setavtransporturi",  "input": "$payload"})}
+if($cmd eq 'notify') {return qq($topic { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
 
-if($cmd eq 'notify') {return qq(sonos/$uuid/control { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
-if($cmd eq 'x_raw_payload') {return qq(sonos/$uuid/control $payload)}
-
-#%t=('true'=>'mute','false'=>'unmute');
-#if($cmd eq 'mute')   {return qq(sonos/$uuid/control { "command": "$t{$payload}" } )}
-if($cmd eq 'mute')   {$value = $payload eq "true" ? "mute" : "unmute"; return qq(sonos/$uuid/control { "command": "$value" } )}
-#%t=('TV'=>'tv','Line_In'=>'line','Queue'=>'queue');
-#if($cmd eq 'input')  {return qq(sonos/$uuid/control { "command": "switchto$t{$payload}" } ) }
-if($cmd eq 'input')  {$value = $payload eq "TV" ? "tv" : $payload eq "Line_In" ? "line" : "queue"; return qq(sonos/$uuid/control { "command": "switchto$value" } ) }
-
-if($cmd eq 'leaveGroup') {$value = ReadingsVal($uuid,"groupName","all"); return qq(sonos/$uuid/control { "command": "leavegroup",  "input": "$value" } ) }
-
+my %t=('true'=>'mute','false'=>'unmute');
+if($cmd eq 'mute')   {return qq(sonos/$uuid/control { "command": "$t{$payload}" } )}
+if($cmd eq 'input')  {
+   $value = $payload eq "TV" ? "tv" : $payload eq "Line_In" ? "line" : "queue"; 
+   return qq($topic { "command": "switchto$value" } ) 
+}
+if($cmd eq 'leaveGroup') {
+   $value = ReadingsVal($uuid,"groupName","all");
+   return qq($topic { "command": "leavegroup",  "input": "$value" } ) 
+}
 if($cmd eq 'playUri') {fhem("set $NAME setAVTUri $payload; sleep 1; set $NAME play")}
 if($cmd eq 'sayText') {fhem("setreading $tts text ".ReadingsVal($tts,'text',' ').' '.$text.";sleep 0.4 tts;set $tts tts [$tts:text];sleep $tts:playing:.0 ;set $NAME notify [$tts:vol] [$tts:httpName];deletereading $tts text")}
-if($cmd eq 'speak') {fhem("set $tts tts $text;sleep $tts:playing:.0 ;set $NAME notify $vol [$tts:httpName]")}
-if($cmd eq 'playFav') {
-	use JSON;use HTML::Entities;use Encode qw(encode decode);
-	my $enc = 'UTF8';my $uri='';my $search=(split(' ', $EVENT,2))[1];
-	$search=~s/[\/()]/./g;
-	my $dev = (devspec2array('model=sonos2mqtt_bridge'))[0];
-	my $decoded = decode_json(ReadingsVal($dev,'Favorites',''));
-	my @array=@{$decoded->{'Result'}};
-	foreach (@array) {if (encode($enc, decode_entities($_->{'Title'}))=~/$search/i)
-	                   {$uri = $_->{'TrackUri'} }
-		    };
-			fhem("set $NAME playUri $uri") if ($uri ne '');
+
+# for tts-polly command set EG.KU.Sonos speak de-DE Vicki 25 Test
+# test first of String like de-DE 
+if($cmd eq 'speak') {
+  if ($arr[1] =~ /^[a-z]{2}-[A-Z]{2}$/) { 
+     my (undef, $lang, $voice, $volume, @text) = split(/ /, $EVENT); 
+     return sprintf('%s {"command":"speak","input":{"lang": "%s", "name":"%s", "volume":%s, "text": "%s","delayMs":700}}', $topic, $lang, $voice, $volume, join(" ", @text));
+  }
+  else {
+    ($cmd,$vol,$text) = split(' ', $EVENT,3);
+    fhem("set $tts tts $text;sleep $tts:playing:.0 ;set $NAME notify $vol [$tts:httpName]");
+  }
 }
-
+if($cmd eq 'playFav') {
+    use JSON;use HTML::Entities;use Encode qw(encode decode);
+    my $enc = 'UTF8';my $uri='';my $search=(split(' ', $EVENT,2))[1];
+    $search=~s/[\/()]/./g;
+    my $dev = (devspec2array('model=sonos2mqtt_bridge'))[0];
+    my $decoded = decode_json(ReadingsVal($dev,'Favorites',''));
+    my @array=@{$decoded->{'Result'}};
+    for (@array) {
+      if (encode($enc, decode_entities($_->{'Title'}))=~/$search/i)
+         {$uri = $_->{'TrackUri'} }
+   }
+   fhem("set $NAME playUri $uri") if ($uri ne '');
+}
+if($cmd eq 'sleep') {
+    $payload = strftime("%H:%M:%S",gmtime($payload*60));
+    return qq($topic { "command": "sleep", "input": "$payload" }) 
+}
 if($cmd eq 'test') {Log 1, "Das Device $NAME hat ausgeloest, die uuid ist >$uuid< der Befehl war >$cmd< der Teil danach sah so aus: $payload"}
-
+if($cmd eq 'x_raw_payload') {return qq($topic $payload)}
+# if return for other reasons, the response had to be undef
 return undef;
 }
-#######
+####### devStateIcon
 sub sonos2mqtt_devStateIcon
 {
 my ($name) = @_;
@@ -127,7 +154,7 @@ my ($devspec,$attr,$item) = @_;
 my @devlist = devspec2array($devspec);
 my ($first,$sec)=split(':',$item,2);
 $first=~s/^\s+//;
-foreach (@devlist) {
+for (@devlist) {
    my @arr = grep {$_ !~ $first} split("\n",AttrVal($_,$attr,''));
    push @arr,$item;
    my $val = join "\n",sort @arr;
@@ -135,20 +162,22 @@ foreach (@devlist) {
    fhem("attr $_ $attr $val")}
 }
 
+#### Setup some additional features in speaker and bridge
 sub sonos2mqtt_setup
 {
 my $devspec = shift @_ // 'a:model=sonos2mqtt_speaker';
 my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
 fhem("attr $devspec".q( devStateIcon {sonos2mqtt($name,'devStateIcon')}));
-#sonos2mqtt_mod_list('a:model=sonos2mqtt_bridge','readingList','sonos/RINCON_([0-9A-Z]+)/Reply:.* Reply');
 for ('stop:noArg','play:noArg','pause:noArg','toggle:noArg','volume:slider,0,1,100','volumeUp:noArg','volumeDown:noArg',
      'mute:true,false','next:noArg','previous:noArg','leaveGroup:noArg','setAVTUri:textField','playUri:textField',
-     'notify:textField','x_raw_payload:textField','sayText:textField','speak:textField','input:Queue') {
+     'notify:textField','x_raw_payload:textField','sayText:textField','speak:textField','input:Queue',
+     'sleep:selectnumbers,0,15,120,0,lin') {
            sonos2mqtt_mod_list($devspec,'setList',$_.q( {sonos2mqtt($NAME,$EVENT)}));
     }
-
-my @tv = ("S14","S11","S9");
+my @tv   = ("S14","S11","S9");
 my @line = ("S5","Z90","ZP120");
+# to get the Favorites at this point is only a workaround. Bad for the first player
+if (!ReadingsVal($bridge,'favlist',0)) {my $fav = fhem("get $bridge Favorites")}
 for (devspec2array($devspec)) {
     my $mn = ReadingsVal($_,'modelNumber','');
     fhem("set $_ volume ".ReadingsVal($_,'volume','10')); # trick to initiate the userReadings 
@@ -159,6 +188,7 @@ for (devspec2array($devspec)) {
   }
 }
 
+#### code for notify for two different triggers: defined and IPAddress is responded 
 # delete n_configSonos.
 # defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
 # for Test use "test $EVENT"
@@ -168,7 +198,7 @@ my ($NAME,$EVENT) = @_;
 my @arr = split(' ',$EVENT);
 if ($arr[0] eq 'test') {Log 1, "Device $NAME, EVENT >$EVENT<";shift @arr}
 if ($NAME eq 'global'){
-      fhem(qq(sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker; set $arr[1] x_raw_payload {"command": "adv-command","input": {"cmd":"GetZoneInfo","reply":"ZoneInfo"}}))
+      fhem(qq(sleep 1; set $arr[1] attrTemplate sonos2mqtt_speaker))
    }
  else{
       my $url="http://$arr[1]:1400";
@@ -183,19 +213,13 @@ if ($NAME eq 'global'){
    }
 }
 
+# could be removed later only for temporary compatibitility 
 # setplayFav, setjoinGroup not working well from inside setList Bridge
 # from commandline could used like {sonos2mqtt_bridge('SonosBridge','setplayFav')}
 # joinGroup does'nt working with spaces in "Player Rooms"
 sub sonos2mqtt_bridge
 {
-my ($NAME,$EVENT)=@_;
-my @arr = split(' ',$EVENT);
-my $cmd = $arr[0];
-
-if($cmd eq 'Favorites') {return q(sonos/).ReadingsVal((devspec2array('a:model=sonos2mqtt_speaker'))[0],'uuid','').q(/control {"command": "adv-command","input": {"cmd": "GetFavorites","reply": "Favorites"}})}
-if($cmd eq 'setplayFav') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($NAME,'favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
-if($cmd eq 'setjoinGroup') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($NAME,'grouplist','').' {sonos2mqtt($NAME,$EVENT)}')}
-return undef
+sonos2mqtt(@_);
 }
 
 1;
