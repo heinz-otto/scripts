@@ -94,19 +94,21 @@ if($cmd eq 'volume') {
 }
 if($cmd eq 'play') {
    if (@arr == 1) { $payload = qq({ "command": "$cmd" }) }
-   elsif ($arr[1] eq 'Radio') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Radios"}
-   elsif ($arr[1] eq 'Favorite') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Favorites"}
-   elsif ($arr[1] eq 'Playlist') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Playlists"}
-   my ($uri,$ItemId,$UpnpClass,$CdUdn)=sonos2mqtt_searchList($search,$fav);
-   if ($arr[1] eq 'Playlist') {
+   else {
+     if ($arr[1] eq 'Radio') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Radios"}
+     elsif ($arr[1] eq 'Favorite') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Favorites"}
+     elsif ($arr[1] eq 'Playlist') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Playlists"}
+     my ($uri,$ItemId,$UpnpClass,$CdUdn)=sonos2mqtt_searchList($search,$fav);
+     if ($arr[1] eq 'Playlist') {
        $payload = qq({"command": "adv-command","input": { "cmd": "AVTransportService.RemoveAllTracksFromQueue" }});
        fhem("set $NAME x_raw_payload $payload");
 	   fhem("set $NAME input Queue");
 	   $payload = qq({"UpnpClass": "$UpnpClass","ItemId": "$ItemId","CdUdn": "$CdUdn"});
 	   $payload = qq({ "InstanceID": 0,"DesiredFirstTrackNumberEnqueued": 0,"EnqueueAsNext": true,"EnqueuedURI":"$uri","EnqueuedURIMetaData": $payload});
 	   $payload = qq({ "command": "adv-command","input": {"cmd": "AVTransportService.AddURIToQueue","val": $payload}});
+     }
+     else { $payload = qq({ "command": "setavtransporturi",  "input": "$uri"}) }
    }
-   else { $payload = qq({ "command": "setavtransporturi",  "input": "$uri"}) }
    return qq($topic $payload);
 }
 
