@@ -173,7 +173,7 @@ sub sonos2mqtt_searchList
 {
 use JSON;use HTML::Entities;use Encode qw(encode decode);
 my $regex = shift //return'';
-my $list =   shift //return'';
+my $list  = shift //return'';
 my $enc = 'UTF8';
 my $uri = '';my $UpnpClass = '';my $ItemId = '';my $CdUdn = '';
 my $dev = (devspec2array('model=sonos2mqtt_bridge'))[0];
@@ -182,11 +182,12 @@ my @array=@{$decoded->{'Result'}};
    $regex=~s/[\/()]/./g;
    for (@array) {
       if (encode($enc, decode_entities($_->{'Title'}))=~/$regex/i)
-         {$uri = $_->{'TrackUri'};
-		  $ItemId = $_->{'ItemId'} || '';
-		  $UpnpClass= $_->{'UpnpClass'} || '';
-		  $CdUdn= $_->{'CdUdn'} || '';
-		 }
+         {
+          $uri = $_->{'TrackUri'};
+          $ItemId = $_->{'ItemId'} || '';
+          $UpnpClass= $_->{'UpnpClass'} || '';
+          $CdUdn= $_->{'CdUdn'} || '';
+         }
    }
    return ($uri,$ItemId,$UpnpClass,$CdUdn);
 }
