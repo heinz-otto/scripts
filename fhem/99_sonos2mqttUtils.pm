@@ -1,5 +1,5 @@
 ##############################################
-# $Id: 99_sonos2mqttUtils.pm 23879 2021-03-02 11:52:16Z Otto123 $
+# $Id$
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for sonos2mqtt Implementation
 # They are then available in every Perl expression.
@@ -10,11 +10,11 @@ use strict;
 use warnings;
 
 sub
-sonos2mqttUtils_Initialize($$)
+sonos2mqttUtils_Initialize 
 {
-  my ($hash) = @_;
+  my $hash = shift;
+  return;
 }
-
 # Enter you functions below _this_ line.
 
 ##### Responses for getList and setList commands
@@ -38,7 +38,7 @@ if ($NAME eq $bridge){
       fhem("setreading $tts text ".ReadingsVal($tts,'text',' ').' '.$text.";sleep 0.4 tts;set $tts tts [$tts:text];sleep $tts:playing:.0 ;set $NAME notifyall [$tts:vol] [$tts:httpName];deletereading $tts text");
    }
    if($cmd eq 'Favorites') {return "$devicetopic/".ReadingsVal((devspec2array('a:model=sonos2mqtt_speaker'))[0],'uuid','').q(/control {"command": "adv-command","input": {"cmd": "GetFavorites","reply": "Favorites"}})}
-   if($cmd eq 'setplayFav') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.ReadingsVal($NAME,'favlist','').' {sonos2mqtt($NAME,$EVENT)}')}
+   if($cmd eq 'setplayFav') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','playFav:'.sonos2mqtt_getList($bridge,'Favorites').' {sonos2mqtt($NAME,$EVENT)}')}
    if($cmd eq 'setjoinGroup') {sonos2mqtt_mod_list('a:model=sonos2mqtt_speaker','setList','joinGroup:'.ReadingsVal($NAME,'grouplist','').' {sonos2mqtt($NAME,$EVENT)}')}
    if($cmd eq 'Reply'){
      my $topic = "$devicetopic/".ReadingsVal((devspec2array('a:model=sonos2mqtt_speaker'))[0],'uuid','')."/control";
@@ -68,10 +68,12 @@ my $payload = $EVENT;
 my ($search,$fav);
 if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 
-# if Radio next Station
-my $Input = ReadingsVal($NAME,'Input','');
-if($cmd eq 'next' and $Input eq 'Radio') {
-   fhem("set $NAME playFav {(Each('$bridge',ReadingsVal('$bridge','favlist','')))}");
+# if Radio next Station from favlist 
+# no Idea to detect automatically difference between Favorites and Radios
+if($cmd eq 'next' and ReadingsVal($NAME,'Input','') eq 'Radio') {
+   if (ReadingsVal($NAME,'transportState','') eq 'PLAYING'){ fhem("sleep 1;set $NAME play") }
+   fhem("set $NAME play Favorite {(Each('$bridge',ReadingsVal('$bridge','favlist',sonos2mqtt_getList ('$bridge','Favorites')))}");
+#   fhem("set $NAME play Radio {(Each('$bridge',ReadingsVal('$bridge','favlist',sonos2mqtt_getList ('$bridge','Radios')))}");
    return ''
 }
 my @easycmd = ('stop','pause','toggle','volumeUp','volumeDown','next','previous');
@@ -92,12 +94,11 @@ if($cmd eq 'volume') {
       return ''
    }
 }
-if($cmd eq 'play') {
+
+if ($cmd eq 'play') {
    if (@arr == 1) { $payload = qq({ "command": "$cmd" }) }
    else {
-     if ($arr[1] eq 'Radio') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Radios"}
-     elsif ($arr[1] eq 'Favorite') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Favorites"}
-     elsif ($arr[1] eq 'Playlist') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Playlists"}
+     if (grep { $_ eq $arr[1] } ('Radio','Favorite','Playlist')) {$search = (split(' ', $EVENT,3))[2] ;$fav = $arr[1].'s'}
      my ($uri,$ItemId,$UpnpClass,$CdUdn)=sonos2mqtt_searchList($search,$fav);
      if ($arr[1] eq 'Playlist') {
        $payload = qq({"command": "adv-command","input": { "cmd": "AVTransportService.RemoveAllTracksFromQueue" }});
@@ -109,6 +110,7 @@ if($cmd eq 'play') {
      }
      else { $payload = qq({ "command": "setavtransporturi",  "input": "$uri"}) }
    }
+   #Log 1, qq(play Kommando $topic $payload);
    return qq($topic $payload);
 }
 
@@ -142,11 +144,8 @@ if($cmd eq 'speak') {
   }
 }
 if($cmd eq 'playFav') {
-   $fav = "Favorites";
-   $search = (split(' ', $EVENT,2))[1];
-   if ($arr[1] eq 'Radio') {$search = (split(' ', $EVENT,3))[2] ;$fav = "Radios"}
-   my ($uri,$ItemId,$UpnpClass,$CdUdn)=sonos2mqtt_searchList($search,$fav);
-   fhem("set $NAME playUri $uri") if ($uri ne '');
+  fhem("set $NAME play Favorite $payload");
+  fhem("sleep 1;set $NAME play");
 }
 if($cmd eq 'sleep') {
     $payload = strftime("%H:%M:%S",gmtime($payload*60));
@@ -265,6 +264,7 @@ if ($devspec eq 'a:model=sonos2mqtt_bridge'){
    sonos2mqtt_mod_list($devspec,'setList','announcementall:textField'.q( {sonos2mqtt($NAME,$EVENT)}));
    sonos2mqtt_mod_list($devspec,'readingList',AttrVal($bridge,"devicetopic",'sonos').'/RINCON_([0-9A-Z]+)/Favorites:.* Favorites');
    sonos2mqtt_mod_list($devspec,'readingList',AttrVal($bridge,"devicetopic",'sonos').'/RINCON_([0-9A-Z]+)/Reply:.* Reply');
+   sonos2mqtt_mod_list($devspec,'getList','Reply:Favorites,Radios,Playlists Reply'.q( {sonos2mqtt($NAME,$EVENT)}));
    return undef
 }
 
@@ -278,20 +278,19 @@ for ('stop:noArg','play:noArg','pause:noArg','toggle:noArg','volume:slider,0,1,1
 my @tv   = ("S14","S11","S9");
 my @line = ("S5","Z90","ZP120");
 # to get the Favorites at this point is only a workaround. Bad for the first player
-if (!ReadingsVal($bridge,'favlist',0)) {my $fav = fhem("get $bridge Favorites")}
+#if (!ReadingsVal($bridge,'favlist',0)) {my $fav = fhem("get $bridge Favorites")}
 for (devspec2array($devspec)) {
     my $mn = ReadingsVal($_,'modelNumber','');
     if (grep {/$mn/} @tv) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
     if (grep {/$mn/} @line) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
     sonos2mqtt_mod_list($_,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
-    sonos2mqtt_mod_list($_,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
+#    sonos2mqtt_mod_list($_,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
     fhem("set $_ volumeUp; set $_ volumeDown"); # trick to initiate the userReadings 
   }
 return ''
 }
 
 #### code for notify for two different triggers: defined and IPAddress is responded 
-# delete n_configSonos.
 # defmod n_configSonos notify global:DEFINED.MQTT2_RINCON_[A-Z0-9]+|MQTT2_RINCON_[A-Z0-9]+:IPAddress:.* {sonos2mqtt_nty($NAME,$EVENT)}
 # for Test use "test $EVENT"
 sub sonos2mqtt_nty
@@ -333,18 +332,7 @@ if ($reading eq 'grouplist'){
   return join(',', sort @out)
 }
 if ($reading eq 'favlist'){
-   use JSON;
-   use HTML::Entities;
-   use Encode qw(encode decode);
-   my $enc = 'UTF8';
-   my $decoded = decode_json(ReadingsVal($name,'Favorites',''));
-   my @arr  = @{$decoded->{'Result'}};
-   for (@arr) {
-     my $dec = encode($enc, decode_entities($_->{'Title'}));
-     $dec =~ s/\s/./g;
-     if ($_->{'TrackUri'} =~ /x-sonosapi-stream/) {push @out,$dec}
-   }
-  return join ',', sort @out
+sonos2mqtt_getList ($name,'Favorites')
 }
 
 if ($reading eq 'Input') {
@@ -354,6 +342,31 @@ if ($reading eq 'Input') {
       ? 'TV'    : ReadingsVal($name,'enqueuedMetadata_UpnpClass','') eq 'object.item.audioItem.audioBroadcast'
       ? 'Radio' : 'Playlist'
   }
+}
+
+# return a list of Titles from the favorite json Arrays
+# the Favorites Array will be filtered and returns only Radio stations
+sub sonos2mqtt_getList
+{
+my $name = shift // return '';
+my $reading = shift || 'Favorites';
+my @out;
+   use JSON;
+   use HTML::Entities;
+   use Encode qw(encode decode);
+   my $enc = 'UTF8';
+   my $decoded = decode_json(ReadingsVal($name,$reading,''));
+   my @arr  = @{$decoded->{'Result'}};
+   for (@arr) {
+     my $dec = encode($enc, decode_entities($_->{'Title'}));
+     $dec =~ s/\s/./g;
+     if ($reading eq 'Favorites') {
+	    if ( $_->{'TrackUri'} =~ /x-sonosapi-stream/) {
+	       push @out,$dec
+	    }
+	 } else {push @out,$dec}
+   }
+  return join ',', sort @out
 }
 
 1;
