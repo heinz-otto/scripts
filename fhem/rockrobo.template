@@ -1,27 +1,34 @@
 # rockrobo
 # The rockrobo device
-name:rockrobo
-desc:The rockrobo device, Forum #123456 and Wiki 
-filter:TYPE=MQTT2_DEVICE
-order:x_011
+name:roborockRE
+filter:TYPE=MQTT2_DEVICE:FILTER=readingList=.*valetudo[/].*
+desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed. For details visit https://github.com/rand256/valetudo/wiki<br>NOTE: Initial version not all Features implemented, Forum #123456 and Wiki<br> 
+order:X_04
+par:BASE_ID;BASE_ID typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:BASE_TOPIC;base topic;{ AttrVal("DEVICE","devicetopic",'valetudo') }
+par:DEVNAME;DEVNAME typically is rockrobo;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
 par:ICON;ICON as set, defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
+#{ Svn_GetFile("contrib/AttrTemplate/99_roborockUtils.pm", "FHEM/99_roborockUtils.pm", sub(){CommandReload(undef, "99_roborockUtils")}) }
+deletereading -q DEVICE (?!associatedWith).*
+defmod DEVICE MQTT2_\DEVICE DEVNAME
 attr DEVICE icon ICON
+attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
+attr DEVICE alias DEVNAME
 attr DEVICE readingList\
 homeassistant/vacuum/valetudo_rockrobo/config:.* { json2nameValue($EVENT) }\
-valetudo/rockrobo/state:.* { json2nameValue($EVENT) }\
-valetudo/rockrobo/attributes:.* { json2nameValue($EVENT) }\
-valetudo/rockrobo/map_data:.* {attrTmqtt2_roborock_valetudo2svg("map_data",$EVENT,"www/images/rockrobo_map.svg")}\
-valetudo/rockrobo/command_status:.* { json2nameValue($EVENT) }\
-valetudo/rockrobo/destinations:.* { my (%h,$cnt); $EVENT=~ s/(\{[^{]*?})/$h{"SpotZone_".++$cnt}=$1/ge; \%h }
+BASE_ID/DEVNAME/state:.* { json2nameValue($EVENT) }\
+BASE_ID/DEVNAME/attributes:.* { json2nameValue($EVENT) }\
+BASE_ID/DEVNAME/map_data:.* {attrTmqtt2_roborock_valetudo2svg("map_data",$EVENT,"www/images/rockrobo_map.svg")}\
+BASE_ID/DEVNAME/command_status:.* { json2nameValue($EVENT) }\
+BASE_ID/DEVNAME/destinations:.* { my (%h,$cnt); $EVENT=~ s/(\{[^{]*?})/$h{"SpotZone_".++$cnt}=$1/ge; \%h }
 attr DEVICE setList\
-start:noArg valetudo/rockrobo/command start\
-charge:noArg valetudo/rockrobo/command return_to_base\
-stop:noArg valetudo/rockrobo/command stop\
-spot:noArg valetudo/rockrobo/command clean_spot\
-pause:noArg valetudo/rockrobo/command pause\
-locate:noArg valetudo/rockrobo/command locate\
-fan_power:min,medium,high,max,mop valetudo/rockrobo/set_fan_speed $EVTPART1\
+start:noArg BASE_ID/DEVNAME/command start\
+charge:noArg BASE_ID/DEVNAME/command return_to_base\
+stop:noArg BASE_ID/DEVNAME/command stop\
+spot:noArg BASE_ID/DEVNAME/command clean_spot\
+pause:noArg BASE_ID/DEVNAME/command pause\
+locate:noArg BASE_ID/DEVNAME/command locate\
+fan_power:min,medium,high,max,mop BASE_ID/DEVNAME/set_fan_speed $EVTPART1\
 zone:textField {valetudoRE $EVENT}\
 reset_consumable:main,side,filter,sensor {valetudoRE $EVENT}\
 goto:Eimer,Kamin,Tisch,VorBad {valetudoRE $EVENT}\
@@ -30,6 +37,5 @@ store_map:textField {valetudoRE $EVENT}\
 get_dest:noArg {valetudoRE $EVENT}\
 x_raw_payload:textField {valetudoRE $EVENT}
 attr DEVICE model roborock
-attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
 attr DEVICE devicetopic BASE_TOPIC
 setreading DEVICE attrTemplateVersion 20210507
