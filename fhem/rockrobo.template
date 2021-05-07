@@ -1,5 +1,4 @@
-# rockrobo
-# The rockrobo device
+# The rockrobo device for valetudo RE
 name:roborockRE
 filter:TYPE=MQTT2_DEVICE:FILTER=readingList=.*valetudo[/].*
 desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed. For details visit https://github.com/rand256/valetudo/wiki<br>NOTE: Initial version not all Features implemented, Forum #123456 and Wiki<br> 
