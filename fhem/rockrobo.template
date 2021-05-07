@@ -1,4 +1,6 @@
 # The rockrobo device for valetudo RE
+#"wget -qO ./FHEM/99_roborockUtils.pm https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/99_roborockUtils.pm";sleep 5;{CommandReload(undef, "99_roborockUtils")}
+#"wget -qO ./FHEM/lib/AttrTemplate/mqtt2.template https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/rockrobo.template";sleep 5;{ AttrTemplate_Initialize() }
 name:roborockRE
 filter:TYPE=MQTT2_DEVICE:FILTER=readingList=.*valetudo[/].*
 desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed. For details visit https://github.com/rand256/valetudo/wiki<br>NOTE: Initial version not all Features implemented, Forum #123456 and Wiki<br> 
@@ -11,7 +13,7 @@ par:ICON;ICON as set, defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_t
 deletereading -q DEVICE (?!associatedWith).*
 defmod DEVICE MQTT2_\DEVICE DEVNAME
 attr DEVICE icon ICON
-attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
+#attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
 attr DEVICE alias DEVNAME
 attr DEVICE readingList\
 homeassistant/vacuum/valetudo_rockrobo/config:.* { json2nameValue($EVENT) }\
