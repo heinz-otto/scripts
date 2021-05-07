@@ -1,0 +1,35 @@
+# rockrobo
+# The rockrobo device
+name:rockrobo
+desc:The rockrobo device, Forum #123456 and Wiki 
+filter:TYPE=MQTT2_DEVICE
+order:x_011
+par:BASE_TOPIC;base topic;{ AttrVal("DEVICE","devicetopic",'valetudo') }
+par:ICON;ICON as set, defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
+attr DEVICE icon ICON
+attr DEVICE readingList\
+homeassistant/vacuum/valetudo_rockrobo/config:.* { json2nameValue($EVENT) }\
+valetudo/rockrobo/state:.* { json2nameValue($EVENT) }\
+valetudo/rockrobo/attributes:.* { json2nameValue($EVENT) }\
+valetudo/rockrobo/map_data:.* {attrTmqtt2_roborock_valetudo2svg("map_data",$EVENT,"www/images/rockrobo_map.svg")}\
+valetudo/rockrobo/command_status:.* { json2nameValue($EVENT) }\
+valetudo/rockrobo/destinations:.* { my (%h,$cnt); $EVENT=~ s/(\{[^{]*?})/$h{"SpotZone_".++$cnt}=$1/ge; \%h }
+attr DEVICE setList\
+start:noArg valetudo/rockrobo/command start\
+charge:noArg valetudo/rockrobo/command return_to_base\
+stop:noArg valetudo/rockrobo/command stop\
+spot:noArg valetudo/rockrobo/command clean_spot\
+pause:noArg valetudo/rockrobo/command pause\
+locate:noArg valetudo/rockrobo/command locate\
+fan_power:min,medium,high,max,mop valetudo/rockrobo/set_fan_speed $EVTPART1\
+zone:textField {valetudoRE $EVENT}\
+reset_consumable:main,side,filter,sensor {valetudoRE $EVENT}\
+goto:Eimer,Kamin,Tisch,VorBad {valetudoRE $EVENT}\
+load_map:textField {valetudoRE $EVENT}\
+store_map:textField {valetudoRE $EVENT}\
+get_dest:noArg {valetudoRE $EVENT}\
+x_raw_payload:textField {valetudoRE $EVENT}
+attr DEVICE model roborock
+attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
+attr DEVICE devicetopic BASE_TOPIC
+setreading DEVICE attrTemplateVersion 20210507
