@@ -17,7 +17,7 @@ attr DEVICE readingList\
 homeassistant/vacuum/valetudo_rockrobo/config:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/state:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/attributes:.* { json2nameValue($EVENT) }\
-BASE_ID/DEVNAME/map_data:.* {attrTmqtt2_roborock_valetudo2svg("map_data",$EVENT,"www/images/rockrobo_map.svg")}\
+BASE_ID/DEVNAME/map_data:.* {'not supported'}\
 BASE_ID/DEVNAME/command_status:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/destinations:.* { my (%h,$cnt); $EVENT=~ s/(\{[^{]*?})/$h{"SpotZone_".++$cnt}=$1/ge; \%h }
 attr DEVICE setList\
