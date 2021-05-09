@@ -7,37 +7,38 @@ desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed.
 order:X_04
 par:BASE_ID;BASE_ID typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:BASE_TOPIC;base topic;{ AttrVal("DEVICE","devicetopic",'valetudo') }
+par:DEV_ID;DEV_ID typically is rockrobo;
 par:DEVNAME;DEVNAME typically is rockrobo;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
 par:ICON;ICON as set, defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
 #{ Svn_GetFile("contrib/AttrTemplate/99_roborockUtils.pm", "FHEM/99_roborockUtils.pm", sub(){CommandReload(undef, "99_roborockUtils")}) }
 deletereading -q DEVICE (?!associatedWith).*
-defmod DEVICE MQTT2_\DEVICE DEVNAME
+defmod DEVICE MQTT2_\DEVICE DEV_ID
 attr DEVICE icon ICON
+attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 #attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
-attr DEVICE alias DEVNAME
+attr DEVICE alias DEV_ID
 attr DEVICE readingList\
 homeassistant/vacuum/valetudo_rockrobo/config:.* {}\
-BASE_ID/DEVNAME/state:.* { json2nameValue($EVENT) }\
-BASE_ID/DEVNAME/attributes:.* { json2nameValue($EVENT) }\
-BASE_ID/DEVNAME/map_data:.* {}\
-BASE_ID/DEVNAME/command_status:.* { json2nameValue($EVENT) }\
-BASE_ID/DEVNAME/destinations:.* { valetudoREdest($EVENT) }
+$\DEVICETOPIC/state:.* { json2nameValue($EVENT) }\
+$\DEVICETOPIC/attributes:.* { json2nameValue($EVENT) }\
+$\DEVICETOPIC/map_data:.* {}\
+$\DEVICETOPIC/command_status:.* { json2nameValue($EVENT) }\
+$\DEVICETOPIC/destinations:.* { valetudoREdest($EVENT) }
 attr DEVICE setList\
-charge:noArg BASE_ID/DEVNAME/command return_to_base\
-fan_power:whisper,min,medium,high,max,mop BASE_ID/DEVNAME/set_fan_speed $EVTPART1\
+charge:noArg $\DEVICETOPIC/command return_to_base\
+fan_power:whisper,min,medium,high,max,mop $\DEVICETOPIC/set_fan_speed $EVTPART1\
 get_dest:noArg { valetudoRE($EVENT) }\
 goto:textField { valetudoRE($EVENT) }\
 load_map:textField { valetudoRE($EVENT) }\
-locate:noArg BASE_ID/DEVNAME/command locate\
+locate:noArg $\DEVICETOPIC/command locate\
 map:load,store { valetudoRE($EVENT) }\
-pause:noArg BASE_ID/DEVNAME/command pause\
+pause:noArg $\DEVICETOPIC/command pause\
 reset_consumable:main,side,filter,sensor { valetudoRE($EVENT) }\
-spot:noArg BASE_ID/DEVNAME/command clean_spot\
-start:noArg BASE_ID/DEVNAME/command start\
-stop:noArg BASE_ID/DEVNAME/command stop\
+spot:noArg $\DEVICETOPIC/command clean_spot\
+start:noArg $\DEVICETOPIC/command start\
+stop:noArg $\DEVICETOPIC/command stop\
 store_map:textField { valetudoRE($EVENT) }\
 zone:textField { valetudoRE($EVENT) }\
 x_raw_payload:textField { valetudoRE($EVENT) }
 attr DEVICE model roborock
-attr DEVICE devicetopic BASE_TOPIC
 setreading DEVICE attrTemplateVersion 20210507
