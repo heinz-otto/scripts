@@ -21,7 +21,7 @@ BASE_ID/DEVNAME/state:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/attributes:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/map_data:.* {'not supported'}\
 BASE_ID/DEVNAME/command_status:.* { json2nameValue($EVENT) }\
-BASE_ID/DEVNAME/destinations:.* { my (%h,$cnt); $EVENT=~ s/(\{[^{]*?})/$h{"SpotZone_".++$cnt}=$1/ge; \%h }
+BASE_ID/DEVNAME/destinations:.* { valetudoREdest($EVENT) }
 attr DEVICE setList\
 start:noArg BASE_ID/DEVNAME/command start\
 charge:noArg BASE_ID/DEVNAME/command return_to_base\
@@ -30,13 +30,13 @@ spot:noArg BASE_ID/DEVNAME/command clean_spot\
 pause:noArg BASE_ID/DEVNAME/command pause\
 locate:noArg BASE_ID/DEVNAME/command locate\
 fan_power:min,medium,high,max,mop BASE_ID/DEVNAME/set_fan_speed $EVTPART1\
-zone:textField {valetudoRE $EVENT}\
-reset_consumable:main,side,filter,sensor {valetudoRE $EVENT}\
-goto:Eimer,Kamin,Tisch,VorBad {valetudoRE $EVENT}\
-load_map:textField {valetudoRE $EVENT}\
-store_map:textField {valetudoRE $EVENT}\
-get_dest:noArg {valetudoRE $EVENT}\
-x_raw_payload:textField {valetudoRE $EVENT}
+zone:textField { valetudoRE($EVENT) }\
+reset_consumable:main,side,filter,sensor { valetudoRE($EVENT) }\
+goto:Eimer,Kamin,Tisch,VorBad { valetudoRE($EVENT) }\
+load_map:textField { valetudoRE($EVENT) }\
+store_map:textField { valetudoRE($EVENT) }\
+get_dest:noArg { valetudoRE($EVENT) }\
+x_raw_payload:textField { valetudoRE($EVENT) }
 attr DEVICE model roborock
 attr DEVICE devicetopic BASE_TOPIC
 setreading DEVICE attrTemplateVersion 20210507
