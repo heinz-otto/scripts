@@ -40,5 +40,6 @@ stop:noArg $\DEVICETOPIC/command stop\
 store_map:textField { valetudoRE($EVENT) }\
 zone:textField { valetudoRE($EVENT) }\
 x_raw_payload:textField { valetudoRE($EVENT) }
+attr DEVICE setStateList charge fan_power get_dest goto locate map pause reset_consumable spot start stop zone x_raw_payload
 attr DEVICE model roborock
 setreading DEVICE attrTemplateVersion 20210507
