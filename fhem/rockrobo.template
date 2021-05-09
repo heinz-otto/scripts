@@ -29,10 +29,10 @@ stop:noArg BASE_ID/DEVNAME/command stop\
 spot:noArg BASE_ID/DEVNAME/command clean_spot\
 pause:noArg BASE_ID/DEVNAME/command pause\
 locate:noArg BASE_ID/DEVNAME/command locate\
-fan_power:min,medium,high,max,mop BASE_ID/DEVNAME/set_fan_speed $EVTPART1\
+fan_power:whisper,min,medium,high,max,mop BASE_ID/DEVNAME/set_fan_speed $EVTPART1\
 zone:textField { valetudoRE($EVENT) }\
 reset_consumable:main,side,filter,sensor { valetudoRE($EVENT) }\
-goto:Eimer,Kamin,Tisch,VorBad { valetudoRE($EVENT) }\
+goto:textField { valetudoRE($EVENT) }\
 load_map:textField { valetudoRE($EVENT) }\
 store_map:textField { valetudoRE($EVENT) }\
 get_dest:noArg { valetudoRE($EVENT) }\
