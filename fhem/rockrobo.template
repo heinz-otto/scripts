@@ -23,19 +23,20 @@ BASE_ID/DEVNAME/map_data:.* {}\
 BASE_ID/DEVNAME/command_status:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/destinations:.* { valetudoREdest($EVENT) }
 attr DEVICE setList\
-start:noArg BASE_ID/DEVNAME/command start\
 charge:noArg BASE_ID/DEVNAME/command return_to_base\
-stop:noArg BASE_ID/DEVNAME/command stop\
-spot:noArg BASE_ID/DEVNAME/command clean_spot\
-pause:noArg BASE_ID/DEVNAME/command pause\
-locate:noArg BASE_ID/DEVNAME/command locate\
 fan_power:whisper,min,medium,high,max,mop BASE_ID/DEVNAME/set_fan_speed $EVTPART1\
-zone:textField { valetudoRE($EVENT) }\
-reset_consumable:main,side,filter,sensor { valetudoRE($EVENT) }\
+get_dest:noArg { valetudoRE($EVENT) }\
 goto:textField { valetudoRE($EVENT) }\
 load_map:textField { valetudoRE($EVENT) }\
+locate:noArg BASE_ID/DEVNAME/command locate\
+map:load,store { valetudoRE($EVENT) }\
+pause:noArg BASE_ID/DEVNAME/command pause\
+reset_consumable:main,side,filter,sensor { valetudoRE($EVENT) }\
+spot:noArg BASE_ID/DEVNAME/command clean_spot\
+start:noArg BASE_ID/DEVNAME/command start\
+stop:noArg BASE_ID/DEVNAME/command stop\
 store_map:textField { valetudoRE($EVENT) }\
-get_dest:noArg { valetudoRE($EVENT) }\
+zone:textField { valetudoRE($EVENT) }\
 x_raw_payload:textField { valetudoRE($EVENT) }
 attr DEVICE model roborock
 attr DEVICE devicetopic BASE_TOPIC
