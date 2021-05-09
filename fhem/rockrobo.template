@@ -5,10 +5,8 @@ name:roborockRE
 filter:TYPE=MQTT2_DEVICE:FILTER=readingList=.*valetudo[/].*
 desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed. For details visit https://github.com/rand256/valetudo/wiki<br>NOTE: Initial version not all Features implemented, Forum #123456 and Wiki<br> 
 order:X_04
-par:BASE_ID;BASE_ID typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
-par:BASE_TOPIC;base topic;{ AttrVal("DEVICE","devicetopic",'valetudo') }
-par:DEV_ID;DEV_ID typically is rockrobo;
-par:DEVNAME;DEVNAME typically is rockrobo;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
+par:BASE_TOPIC; is typically valetudo; {(split '/',ReadingsVal("DEVICE",'subscriptions','valetudo/rockrobo'))[0]}
+par:DEV_ID;     is typically rockrobo; {(split '/',ReadingsVal("DEVICE",'subscriptions','valetudo/rockrobo'))[1]}
 par:ICON;ICON as set, defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
 #{ Svn_GetFile("contrib/AttrTemplate/99_roborockUtils.pm", "FHEM/99_roborockUtils.pm", sub(){CommandReload(undef, "99_roborockUtils")}) }
 deletereading -q DEVICE (?!associatedWith).*
@@ -18,7 +16,7 @@ attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 #attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
 attr DEVICE alias DEV_ID
 attr DEVICE readingList\
-homeassistant/vacuum/valetudo_rockrobo/config:.* {}\
+homeassistant/vacuum/BASE_TOPIC_DEV_ID/config:.* {}\
 $\DEVICETOPIC/state:.* { json2nameValue($EVENT) }\
 $\DEVICETOPIC/attributes:.* { json2nameValue($EVENT) }\
 $\DEVICETOPIC/map_data:.* {}\
