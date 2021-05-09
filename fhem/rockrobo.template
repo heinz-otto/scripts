@@ -16,7 +16,7 @@ attr DEVICE icon ICON
 #attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
 attr DEVICE alias DEVNAME
 attr DEVICE readingList\
-homeassistant/vacuum/valetudo_rockrobo/config:.* { json2nameValue($EVENT) }\
+homeassistant/vacuum/valetudo_rockrobo/config:.* {}\
 BASE_ID/DEVNAME/state:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/attributes:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/map_data:.* {}\
