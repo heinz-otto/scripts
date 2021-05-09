@@ -1,5 +1,5 @@
 ##############################################
-# $Id: 99_roborockUtils.pm 23879 2021-03-02 11:52:16Z Otto123 $
+# $Id: $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for Xiaomi Vaccum MQTT Implementation
 # They are then available in every Perl expression.
@@ -16,6 +16,21 @@ roborockUtils_Initialize
   return;
 }
 # Enter you functions below _this_ line.
+
+# return hash für readings spots an zones containing the comma delimited names
+sub valetudoREdest {
+my $EVENT = shift;
+my ($text,%h);
+$text=decode_json($EVENT);
+for ('spots','zones') {
+    my @a;
+    for my $i (0..$#{$text->{$_}}) {
+      push @a, $text->{$_}->[$i]->{name}
+    }
+    $h{$_} = join ',',@a
+  }
+ return \%h
+}
 
 sub valetudoRE {
 my $EVENT = shift;
