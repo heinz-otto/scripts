@@ -19,7 +19,7 @@ attr DEVICE readingList\
 homeassistant/vacuum/valetudo_rockrobo/config:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/state:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/attributes:.* { json2nameValue($EVENT) }\
-BASE_ID/DEVNAME/map_data:.* {'not supported'}\
+BASE_ID/DEVNAME/map_data:.* {}\
 BASE_ID/DEVNAME/command_status:.* { json2nameValue($EVENT) }\
 BASE_ID/DEVNAME/destinations:.* { valetudoREdest($EVENT) }
 attr DEVICE setList\
