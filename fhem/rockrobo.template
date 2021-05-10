@@ -3,17 +3,16 @@
 #"wget -qO ./FHEM/lib/AttrTemplate/mqtt2.template https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/rockrobo.template";sleep 5;{ AttrTemplate_Initialize() }
 name:roborockRE
 filter:TYPE=MQTT2_DEVICE:FILTER=readingList=.*valetudo[/].*
-desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed. For details visit https://github.com/rand256/valetudo/wiki<br>NOTE: Initial version not all Features implemented, Forum #123456 and Wiki<br> 
+desc:use this for a rooted Xiamoni Vacuum / Roborock with valetudo RE installed. For details visit https://github.com/rand256/valetudo/wiki<br>NOTE: Only tested with Gen1, Forum Board MQTT<br> 
 order:X_04
 par:BASE_TOPIC; is typically valetudo; {(split '/',ReadingsVal("DEVICE",'subscriptions','valetudo/rockrobo'))[0]}
 par:DEV_ID;     is typically rockrobo; {(split '/',ReadingsVal("DEVICE",'subscriptions','valetudo/rockrobo'))[1]}
-par:ICON;ICON as set, defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
+par:ICON;ICON as set defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
 #{ Svn_GetFile("contrib/AttrTemplate/99_roborockUtils.pm", "FHEM/99_roborockUtils.pm", sub(){CommandReload(undef, "99_roborockUtils")}) }
-deletereading -q DEVICE (?!associatedWith).*
+#deletereading -q DEVICE (?!associatedWith).*
 defmod DEVICE MQTT2_\DEVICE DEV_ID
 attr DEVICE icon ICON
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
-#attr DEVICE devStateIcon { '<img src="fhem/images/rockrobo_map.svg" style="max-width:256;;max-height:256;;">' }
 attr DEVICE alias DEV_ID
 attr DEVICE readingList\
 homeassistant/vacuum/BASE_TOPIC_DEV_ID/config:.* {}\
