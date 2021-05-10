@@ -8,8 +8,7 @@ order:X_04
 par:BASE_TOPIC; is typically valetudo; {(split '/',ReadingsVal("DEVICE",'subscriptions','valetudo/rockrobo'))[0]}
 par:DEV_ID;     is typically rockrobo; {(split '/',ReadingsVal("DEVICE",'subscriptions','valetudo/rockrobo'))[1]}
 par:ICON;ICON as set defaults to vacuum_top;{ AttrVal("DEVICE","icon","vacuum_top") }
-#{ Svn_GetFile("contrib/AttrTemplate/99_roborockUtils.pm", "FHEM/99_roborockUtils.pm", sub(){CommandReload(undef, "99_roborockUtils")}) }
-#deletereading -q DEVICE (?!associatedWith).*
+{ Svn_GetFile("contrib/AttrTemplate/99_roborockUtils.pm", "FHEM/99_roborockUtils.pm", sub(){CommandReload(undef, "99_roborockUtils")}) }
 defmod DEVICE MQTT2_\DEVICE DEV_ID
 attr DEVICE icon ICON
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
