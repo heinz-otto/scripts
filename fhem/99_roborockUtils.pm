@@ -1,5 +1,5 @@
 ##############################################
-# $Id: $
+# $Id:  $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for Xiaomi Vaccum MQTT Implementation
 # They are then available in every Perl expression.
@@ -17,7 +17,6 @@ roborockUtils_Initialize
 }
 # Enter you functions below _this_ line.
 
-# return hash für readings spots an zones containing the comma delimited names
 sub valetudoREdest {
 my $EVENT = shift;
 my ($text,%h);
@@ -27,7 +26,7 @@ for ('spots','zones') {
     for my $i (0..$#{$text->{$_}}) {
       push @a, $text->{$_}->[$i]->{name}
     }
-    $h{$_} = join ',',@a
+    $h{$_} = join q{,}, @a
   }
  return \%h
 }
@@ -35,42 +34,35 @@ for ('spots','zones') {
 sub valetudoRE {
 my $EVENT = shift;
 my $ret = 'error';
-my @zid = ();
-my ($cmd,$load) = split(' ', $EVENT,2);
-my $topic = 'valetudo/rockrobo/custom_command';
-if (@_) {Log 1,"sub valetudoRE - Befehl:$cmd Load:$load";return ''}
-if ($cmd eq 'zoned_cleanup') {@zid = split ',',$load}
+my ($cmd,$load) = split(q{ }, $EVENT,2);
+my $topic = 'valetudo/rockrobo';
+my (@zid,@l,%consum);
+if (@_) {Log 1,"sub valetudoRE - Befehl:$cmd Load:$load";return q{}}
 
-my %consum=();
+if ($cmd eq 'zoned_cleanup') {@zid = split q{,},$load}
+if ($cmd eq 'map') {@l = split q{ },$load}
 for (qw(main_brush_work_time side_brush_work_time filter_work_time sensor_dirty_time))
-    {$consum{(split '_',$_)[0]}=$_};
-	
- my %Hcmd = (goto =>
-  {
-    command => 'go_to',
-    spot_id => $load
-  },zone =>
-  {
-    command => 'zoned_cleanup',
-    zone_ids => \@zid
-  },reset_consumable =>
-  {
-    command => 'reset_consumable',
-    consumable => $consum{$load}
-  },store_map => 
+    {$consum{(split q{_})[0]}=$_};
+	 
+ my %Hcmd = (
+    goto =>     { command => 'go_to',spot_id => $load },
+    get_dest => { command => 'get_destinations' },
+    map =>      { command => $l[0].'_map',name => $l[1] },
+	reset_consumable => { command => 'reset_consumable',consumable => $consum{$load} },
+    zone =>     { command => 'zoned_cleanup',zone_ids => \@zid },
+    store_map => 
   {
     command => 'store_map',
     name => $load
-  }, load_map => 
+  },load_map => 
   {
     command => 'load_map',
     name => $load
-  },get_dest =>
-  { command => 'get_destinations'},
- );
+  },
+  );
  if ($cmd eq 'x_raw_payload') {$ret=$load}
  else {$ret = toJSON $Hcmd{$cmd}}
-return $topic.' '.$ret
+return '/custom_command '.$ret
 }
 
 1;
