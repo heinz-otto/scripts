@@ -25,19 +25,18 @@ $\DEVICETOPIC/destinations:.* { valetudoREdest($EVENT) }
 attr DEVICE setList\
 charge:noArg $\DEVICETOPIC/command return_to_base\
 fan_power:whisper,min,medium,high,max,mop $\DEVICETOPIC/set_fan_speed $EVTPART1\
-get_dest:noArg { valetudoRE($EVENT) }\
-goto:textField { valetudoRE($EVENT) }\
-load_map:textField { valetudoRE($EVENT) }\
+get_dest:noArg { $\DEVICETOPIC.valetudoRE($EVENT) }\
+goto:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
 locate:noArg $\DEVICETOPIC/command locate\
-map:load,store { valetudoRE($EVENT) }\
+map:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
 pause:noArg $\DEVICETOPIC/command pause\
-reset_consumable:main,side,filter,sensor { valetudoRE($EVENT) }\
+reset_consumable:main,side,filter,sensor { $\DEVICETOPIC.valetudoRE($EVENT) }\
 spot:noArg $\DEVICETOPIC/command clean_spot\
 start:noArg $\DEVICETOPIC/command start\
 stop:noArg $\DEVICETOPIC/command stop\
-store_map:textField { valetudoRE($EVENT) }\
-zone:textField { valetudoRE($EVENT) }\
-x_raw_payload:textField { valetudoRE($EVENT) }
+zone:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
+x_raw_payload:textField { $\DEVICETOPIC.valetudoRE($EVENT) }
+attr DEVICE userReadings autoReturn:valetudo_state_name:.Idle {fhem("sleep $name:bin_in_time:.0 waitbin;set $name charge");return 'return'}
 attr DEVICE setStateList charge fan_power get_dest goto locate map pause reset_consumable spot start stop zone x_raw_payload
 attr DEVICE model roborock
-setreading DEVICE attrTemplateVersion 20210507
+setreading DEVICE attrTemplateVersion 20210510
