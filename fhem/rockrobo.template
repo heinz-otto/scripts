@@ -37,5 +37,6 @@ zone:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
 x_raw_payload:textField { $\DEVICETOPIC.valetudoRE($EVENT) }
 attr DEVICE userReadings autoReturn:valetudo_state_name:.Idle {fhem("sleep $name:bin_in_time:.0 waitbin;set $name charge");return 'return'}
 attr DEVICE setStateList charge fan_power get_dest goto locate map pause reset_consumable spot start stop zone x_raw_payload
+attr DEVICE event-on-change-reading .*
 attr DEVICE model roborockRE
 setreading DEVICE attrTemplateVersion 20210510
