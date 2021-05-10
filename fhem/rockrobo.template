@@ -23,15 +23,15 @@ $\DEVICETOPIC/destinations:.* { valetudoREdest($EVENT) }
 attr DEVICE setList\
 charge:noArg $\DEVICETOPIC/command return_to_base\
 fan_power:whisper,min,medium,high,max,mop $\DEVICETOPIC/set_fan_speed $EVTPART1\
-get_dest:noArg { $\DEVICETOPIC.valetudoRE($EVENT) }\
-goto:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
 locate:noArg $\DEVICETOPIC/command locate\
-map:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
 pause:noArg $\DEVICETOPIC/command pause\
-reset_consumable:main,side,filter,sensor { $\DEVICETOPIC.valetudoRE($EVENT) }\
 spot:noArg $\DEVICETOPIC/command clean_spot\
 start:noArg $\DEVICETOPIC/command start\
 stop:noArg $\DEVICETOPIC/command stop\
+get_dest:noArg { $\DEVICETOPIC.valetudoRE($EVENT) }\
+goto:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
+map:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
+reset_consumable:main,side,filter,sensor { $\DEVICETOPIC.valetudoRE($EVENT) }\
 zone:textField { $\DEVICETOPIC.valetudoRE($EVENT) }\
 x_raw_payload:textField { $\DEVICETOPIC.valetudoRE($EVENT) }
 attr DEVICE userReadings autoReturn:valetudo_state_name:.Idle {fhem("sleep $name:bin_in_time:.0 waitbin;set $name charge");return 'return'}
