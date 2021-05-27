@@ -30,7 +30,11 @@ attr DEVICE setList mowerRainDelay:slider,0,30,1440 $\DEVICETOPIC/commandIn {"rd
   PartyMode:on,off { my %hash = ( 'on' => 2, 'off' => 1);qq($\DEVICETOPIC/commandIn {"sc":{"m":$hash{$EVTPART1}}})}\
   x_raw_payload:textField { my $payload = $EVENT;$payload =~ s/$EVTPART0 //g; qq($\DEVICETOPIC/commandIn $payload)}
 attr DEVICE stateFormat Active: mowerActive, Status: mowerStatusTxt, Error: mowerErrorTxt
-attr DEVICE userReadings mowerActive:mowerActiveIndex.* {ReadingsVal($name,"mowerActiveIndex","0") ? "true" : "false"},\
+attr DEVICE userReadings mowerActive:mowerActiveIndex:.* {my %activeState = (\
+ 0 => "No",\
+ 1 => "Yes",\
+ 2 => "Party"\
+); $activeState{ReadingsVal($name,"mowerActiveIndex","0")}},\
 mowerStatusTxt:mowerStatusIndex.* {my %stateCodes = (\
  0 => "Idle",\
  1 => "Home",\
