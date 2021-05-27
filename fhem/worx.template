@@ -1,3 +1,5 @@
+# The worx Template for Landroid
+#"wget -qO ./FHEM/lib/AttrTemplate/mqtt2.template https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/worx.template";sleep 5;{ AttrTemplate_Initialize() }
 name:worx_landroid
 desc:Template for a Worx Landroid mower.<br>The complete Setup is described in this <a href="https://forum.fhem.de/index.php/topic,111959.0.html">Forum Thread</a><br>Some Features requires support by model and firmware!
 filter:TYPE=MQTT2_DEVICE
