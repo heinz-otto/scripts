@@ -12,6 +12,8 @@ par:ICON;ICON as set, defaults to audio_volume_low;{ AttrVal("DEVICE","icon","sc
 deletereading -q DEVICE (?!associatedWith).*
 attr DEVICE icon ICON
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
+attr DEVICE alias Mover
+attr DEVICE event-on-change-reading .*
 attr DEVICE readingList $\DEVICETOPIC/commandOut:.* { json2nameValue($EVENT,'',$JSONMAP) }
 attr DEVICE jsonMap dat_rsi:wifiQuality dat_fw:firmware cfg_sn:SerialNumber\
 dat_le:mowerErrorIndex dat_ls:mowerStatusIndex\
