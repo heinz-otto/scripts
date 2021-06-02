@@ -79,4 +79,4 @@ mowerErrorTxt:mowerErrorIndex.* { my %errorCodes = (\
  17 => "Battery temp out of range"\
 ); $errorCodes{ReadingsVal($name,"mowerErrorIndex","0")}}
 attr DEVICE model worx_landroid_mover
-setreading DEVICE attrTemplateVersion 20210530
+setreading DEVICE attrTemplateVersion 20210602
