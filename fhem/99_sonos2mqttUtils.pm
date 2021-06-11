@@ -1,5 +1,5 @@
 ##############################################
-# $Id$
+# $Id: 99_sonos2mqttUtils.pm 24611 2021-06-11 09:59:50Z Otto123 $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for sonos2mqtt Implementation
 # They are then available in every Perl expression.
@@ -72,8 +72,8 @@ if (@arr == 1){$payload = "leer"} else {$payload =~ s/$cmd //}
 # no Idea to detect automatically difference between Favorites and Radios
 if($cmd eq 'next' and ReadingsVal($NAME,'Input','') eq 'Radio') {
    if (ReadingsVal($NAME,'transportState','') eq 'PLAYING'){ fhem("sleep 1;set $NAME play") }
-   fhem("set $NAME play Favorite {(Each('$bridge',ReadingsVal('$bridge','favlist',sonos2mqtt_getList ('$bridge','Favorites')))}");
-#   fhem("set $NAME play Radio {(Each('$bridge',ReadingsVal('$bridge','favlist',sonos2mqtt_getList ('$bridge','Radios')))}");
+   fhem("set $NAME play Favorite {(Each('$bridge',ReadingsVal('$bridge','favlist',sonos2mqtt_getList ('$bridge','Favorites'))))}");
+#   fhem("set $NAME play Radio {(Each('$bridge',ReadingsVal('$bridge','favlist',sonos2mqtt_getList ('$bridge','Radios'))))}");
    return ''
 }
 my @easycmd = ('stop','pause','toggle','volumeUp','volumeDown','next','previous');
@@ -118,7 +118,8 @@ if($cmd eq 'joinGroup') {return qq($topic { "command": "joingroup",  "input": "$
 if($cmd eq 'setAVTUri') {return qq($topic { "command": "setavtransporturi",  "input": "$payload"})}
 if($cmd eq 'notify') {return qq($topic { "command":"notify","input":{"trackUri":"$arr[2]","onlyWhenPlaying":false,"timeout":100,"volume":$arr[1],"delayMs":700}})}
 
-my %t=('true'=>'mute','false'=>'unmute');
+#my %t=('true'=>'mute','false'=>'unmute','on'=>'mute','off'=>'unmute');
+my %t=('true'=>'mute','false'=>'unmute','on'=>'mute','off'=>'unmute','toggle'=>ReadingsVal($NAME,'mute','') eq 'true' ? 'unmute' : 'mute');
 if($cmd eq 'mute')   {return qq(sonos/$uuid/control { "command": "$t{$payload}" } )}
 if($cmd eq 'input')  {
    $value = $payload eq "TV" ? "tv" : $payload eq "Line_In" ? "line" : "queue"; 
@@ -162,7 +163,7 @@ if($cmd eq 'queue') {
 	   return qq($topic $payload);
     }
 }
-
+if($cmd eq 'snoozeAlarm') {return qq($topic ).sonos2mqtt_command('AVTransportService.SnoozeAlarm','InstanceID',0,'Duration',$payload) }
 #if($cmd eq 'test') {Log 1, "Das Device $NAME hat ausgeloest, die uuid ist >$uuid< der Befehl war >$cmd< der Teil danach sah so aus: $payload"}
 if($cmd eq 'test') {Log 1, (split(' ', $EVENT,3))[2]}
 if($cmd eq 'x_raw_payload') {return qq($topic $payload)}
@@ -265,6 +266,9 @@ if ($devspec eq 'a:model=sonos2mqtt_bridge'){
    sonos2mqtt_mod_list($devspec,'readingList',AttrVal($bridge,"devicetopic",'sonos').'/RINCON_([0-9A-Z]+)/Favorites:.* Favorites');
    sonos2mqtt_mod_list($devspec,'readingList',AttrVal($bridge,"devicetopic",'sonos').'/RINCON_([0-9A-Z]+)/Reply:.* Reply');
    sonos2mqtt_mod_list($devspec,'getList','Reply:Favorites,Radios,Playlists Reply'.q( {sonos2mqtt($NAME,$EVENT)}));
+   sonos2mqtt_mod_list($devspec,'readingList',AttrVal($bridge,'devicetopic','sonos').'/alarms:.* Alarms');
+   sonos2mqtt_mod_list($devspec,'getList','listalarms:noArg Alarms $DEVICETOPIC/cmd/listalarm');
+   sonos2mqtt_mod_list($devspec,'setList','setalarm:textField $DEVICETOPIC/cmd/setalarm');
    return undef
 }
 
@@ -284,6 +288,9 @@ for (devspec2array($devspec)) {
     if (grep {/$mn/} @tv) {sonos2mqtt_mod_list($_,'setList','input:Queue,TV'.q( {sonos2mqtt($NAME,$EVENT)}))}
     if (grep {/$mn/} @line) {sonos2mqtt_mod_list($_,'setList','input:Queue,Line_In'.q( {sonos2mqtt($NAME,$EVENT)}))}
     sonos2mqtt_mod_list($_,'setList','joinGroup:'.ReadingsVal($bridge,'grouplist','').q( {sonos2mqtt($NAME,$EVENT)}));
+    sonos2mqtt_mod_list($_,'setList','alarm:textField { sonos2mqtt_alarm($NAME,$EVENT) }');
+    sonos2mqtt_mod_list($_,'setList','snoozeAlarm:textField { sonos2mqtt($NAME,$EVENT) }');
+    sonos2mqtt_mod_list($_,'readingList','$DEVICETOPIC/status/(.*)/avtransport:.* { sonos2mqtt_reading($NAME,$EVENT,$TOPIC) }');
 #    sonos2mqtt_mod_list($_,'setList','playFav:'.ReadingsVal($bridge,'favlist','').q( {sonos2mqtt($NAME,$EVENT)}));
     fhem("set $_ volumeUp; set $_ volumeDown"); # trick to initiate the userReadings 
   }
@@ -369,12 +376,118 @@ my @out;
   return join ',', sort @out
 }
 
+# return json String for x_raw_payload for some advanced commands
+# sonos2mqtt_command ([<ServiceName.>cmdName]<,ValueName,Value,ValueName,Value>)
+# {sonos2mqtt_command ('SetLEDState','DesiredLEDState','On')}
+# {sonos2mqtt_command ('SetBass','DesiredBass',8)}
+# {sonos2mqtt_command ('SetEQ','EQType','DialogLevel','DesiredValue',1)}
+sub sonos2mqtt_command
+{
+use JSON;
+my (%h_value,%h_input) = ();
+my $acmd = shift // return 'error';
+   if ($acmd !~ /\w+\.\w+/) {
+     if ($acmd eq 'SetLEDState' or $acmd eq 'SetButtonLockState') {
+         $acmd = 'DevicePropertiesService.'.$acmd}
+      else {
+         $acmd = 'RenderingControlService.'.$acmd}
+   }
+   if ($acmd =~ /RenderingControlService/) {%h_value = ('InstanceID' => 0,'Channel' => 'Master')}
+   $h_input{'cmd'} = $acmd;
+   while (defined(my $key = shift)) {
+      my $val = shift;
+         $h_value{$key} = $val;
+         $h_input{'val'} = {%h_value}
+   }
+   return encode_json {'command' => 'adv-command','input' => {%h_input}};
+}
+
+ ####### handle alarms
+#
+# syntax:
+# set SonosBridge listalarms
+# set Speaker alarm enable|disable|update all|id[,id]|json
+#
+#######
+sub sonos2mqtt_alarm 
+{
+use JSON;
+my ($NAME,$EVENT)=@_;
+my $bridge = (devspec2array('a:model=sonos2mqtt_bridge'))[0];
+my $alarms = ReadingsVal($bridge,'Alarms','');
+my $decoded = decode_json(ReadingsVal($bridge,'Alarms',''));
+my @array=@{$decoded};
+# part using with bridge
+if ($NAME eq $bridge) {
+  my @speakers = devspec2array('a:model=sonos2mqtt_speaker');
+    foreach my $speaker (@speakers) {
+      my @ids;
+      my @als;
+      for (@array) {
+        if (ReadingsVal($speaker,'uuid','') eq $_->{'RoomUUID'}) {
+          push @ids, $_->{'ID'} ;
+          push @als, to_json($_);
+	    }
+      }
+      my $AlarmListIDs = join ",", @ids;
+      my $AlarmList = join ",", @als;
+      if ($AlarmListIDs) {
+         fhem("setreading $speaker AlarmListIDs $AlarmListIDs")
+         } else {fhem("deletereading $speaker AlarmListIDs")}
+      if ($AlarmList) {
+         fhem("setreading $speaker AlarmList $AlarmList")
+         } else {fhem("deletereading $speaker AlarmList")}
+    }
+  return '';
+ }
+# part using with speakers
+my @arr = split(' ',$EVENT);
+my $cmd = lc shift @arr;
+if ($cmd eq 'alarm') {
+   my $acmd = lc shift @arr;
+   my $ids = shift @arr //return 'all|id[,id]|json missing, usage alarm enable|disable|update all|id[,id]|json';
+   my %t=('enable'=>'true','disable'=>'false');
+   if ($acmd eq 'update') {
+      fhem(qq(set $bridge setalarm $ids));
+      return '';
+   } elsif ($acmd eq 'enable' or $acmd eq 'disable') {
+       if ($ids eq "all") { $ids = ReadingsVal($NAME,"AlarmListIDs","")}
+       for (split ',',$ids) {
+         fhem(qq(set $bridge setalarm {"ID":$_,"Enabled":$t{$acmd}}));
+       }
+     return '';
+   }
+ } else {return 'usage alarm enable|disable|update all|id[,id]|json'}
+}
+
+sub sonos2mqtt_reading
+{
+my ($NAME,$EVENT,$TOPIC)=@_;
+my $uuid = ReadingsVal($NAME,'uuid','');
+my $player = lc( ReadingsVal($NAME,'name','') );
+$TOPIC =~ m,.*/status/(.*)/avtransport,;
+if ( $1 eq $uuid or $1 eq $player ) { 
+    my %hash;
+    if ($EVENT =~ m/"AlarmRunning":(true|false)/) {$hash{"AlarmRunning"}=$1}
+    if ($EVENT =~ m/"SleepTimerGeneration":(\d+)/) {$hash{"SleepTimerGeneration"}=$1}
+    if ($EVENT =~ m/"SnoozeRunning":(true|false)/) {$hash{"SnoozeRunning"}=$1}
+    return \%hash
+  }
+}
+
+
 1;
 =pod
+=item summary    generic MQTT2 Sonos Devices based on sonos2mqtt.
+=item summary_DE generische MQTT2 Sonos Ger&#228;te auf Basis von sonos2mqtt
 =begin html
+
 Some Subroutines for generic MQTT2 Sonos Devices based on sonos2mqtt.
+
 =end html
 =begin html_DE
-Enthaelt einige Subroutinen fuer generische MQTT2 Sonos Geraete auf Basis von sonos2mqtt.
+
+Enthaelt einige Subroutinen fuer generische MQTT2 Sonos Ger&#228;te auf Basis von sonos2mqtt.
+
 =end html_DE
 =cut
