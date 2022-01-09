@@ -12,17 +12,13 @@ attr DEVICE icon vacuum_top
 attr DEVICE readingList \
   $\DEVICETOPIC/\x24state:.* _state\
   $\DEVICETOPIC/AttachmentStateAttribute/dustbin:.* dustbin\
-  $\DEVICETOPIC/AttachmentStateAttribute/mop:.* mop\
-  $\DEVICETOPIC/AttachmentStateAttribute/watertank:.* watertank\
+  $\DEVICETOPIC/AttachmentStateAttribute/.* { $TOPIC =~ m,.*\/(.*),; {"$1"=>$EVENT} }\
   $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
   $\DEVICETOPIC/BasicControlCapability/operation:.* operation\
   $\DEVICETOPIC/CurrentStatisticsCapability/area:.* area\
   $\DEVICETOPIC/CurrentStatisticsCapability/time:.* time\
-  $\DEVICETOPIC/ConsumableMonitoringCapability/brush-main:.* brush-main\
-  $\DEVICETOPIC/ConsumableMonitoringCapability/brush-side_right:.* brush-side_right\
-  $\DEVICETOPIC/ConsumableMonitoringCapability/filter-main:.* filter-main\
-  $\DEVICETOPIC/ConsumableMonitoringCapability/sensor-all:.* sensor-all\
+  $\DEVICETOPIC/ConsumableMonitoringCapability/.* { $TOPIC =~ m,.*\/(.*),; {"$1"=>$EVENT} }\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
   $\DEVICETOPIC/LocateCapability/locate:.* locate\
   $\DEVICETOPIC/MapData/map-data:.* {}\
@@ -31,10 +27,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
-  $\DEVICETOPIC/WifiConfigurationCapability/ssid:.* ssid\
-  $\DEVICETOPIC/WifiConfigurationCapability/ips:.* ips\
-  $\DEVICETOPIC/WifiConfigurationCapability/frequency:.* frequency\
-  $\DEVICETOPIC/WifiConfigurationCapability/signal:.* signal\
+  $\DEVICETOPIC/WifiConfigurationCapability/.* { $TOPIC =~ m,.*\/(.*),; {"$1"=>$EVENT} }\
   $\DEVICETOPIC/ZoneCleaningCapability/presets:.* presets\
   $\DEVICETOPIC/ZoneCleaningCapability/start:.* start
 attr DEVICE setList \
