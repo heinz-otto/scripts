@@ -4,7 +4,7 @@ desc:use this to control a rooted vacuum with valetudo. For further details visi
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
-{ Svn_GetFile("contrib/AttrTemplate/99_valetudoUtils.pm", "FHEM/99_valetudoUtils.pm", sub(){CommandReload(undef, "99_valetudoUtils")}) }
+#{ Svn_GetFile("contrib/AttrTemplate/99_valetudoUtils.pm", "FHEM/99_valetudoUtils.pm", sub(){CommandReload(undef, "99_valetudoUtils")}) }
 
 attr DEVICE alias DEV_ID
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
