@@ -5,7 +5,7 @@ order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
 #{ Svn_GetFile("contrib/AttrTemplate/99_valetudoUtils.pm", "FHEM/99_valetudoUtils.pm", sub(){CommandReload(undef, "99_valetudoUtils")}) }
-
+deletereading -q DEVICE (?!associatedWith|IODev).*
 attr DEVICE alias DEV_ID
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
@@ -23,14 +23,14 @@ attr DEVICE readingList \
   $\DEVICETOPIC/ConsumableMonitoringCapability/brush-side_right:.* brush-side_right\
   $\DEVICETOPIC/ConsumableMonitoringCapability/filter-main:.* filter-main\
   $\DEVICETOPIC/ConsumableMonitoringCapability/sensor-all:.* sensor-all\
-  $\DEVICETOPIC/FanSpeedControlCapability/preset:.* FanSpeed\
+  $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
   $\DEVICETOPIC/LocateCapability/locate:.* locate\
   $\DEVICETOPIC/MapData/map-data:.* {}\
   $\DEVICETOPIC/MapData/segments:.* segments\
   $\DEVICETOPIC/StatusStateAttribute/status:.* state\
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
-  $\DEVICETOPIC/WaterUsageControlCapability/preset:.* WaterUsage\
+  $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
   $\DEVICETOPIC/WifiConfigurationCapability/ssid:.* ssid\
   $\DEVICETOPIC/WifiConfigurationCapability/ips:.* ips\
   $\DEVICETOPIC/WifiConfigurationCapability/frequency:.* frequency\
@@ -41,12 +41,12 @@ attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
   clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }\
   clean_zone:{valetudo_w($name,"presets")} { valetudo_c($NAME,$EVENT) }\
-  fan_power:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
-  water_usage:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
+  fanSpeed:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
+  waterUsage:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
   x_raw_payload:textField { valetudo_c($NAME,$EVENT) }
 attr DEVICE userReadings ip4:ips:.* {(split ',',ReadingsVal($name,'ips','error'))[0]}
 attr DEVICE event-on-change-reading .*
-attr DEVICE setStateList operation clean_segment clean_zone fan_power water_usage x_raw_payload
+attr DEVICE setStateList operation clean_segment clean_zone fanSpeed waterUsage x_raw_payload
 attr DEVICE model valetudo
 setreading DEVICE attrTemplateVersion 20220109 or prior
