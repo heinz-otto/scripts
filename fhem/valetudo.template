@@ -11,25 +11,19 @@ attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
 attr DEVICE readingList \
   $\DEVICETOPIC/\x24state:.* _state\
-  $\DEVICETOPIC/AttachmentStateAttribute/dustbin:.* dustbin\
-  $\DEVICETOPIC/AttachmentStateAttribute/.* { $TOPIC =~ m,.*\/(.*),; {"$1"=>$EVENT} }\
+  $\DEVICETOPIC//(Attach.*|Basic.*|Consum.*|Curr.*|Locate.*|Wifi.*|Zone.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; $1 eq "ips"? {"ipv4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
   $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
-  $\DEVICETOPIC/BasicControlCapability/operation:.* operation\
-  $\DEVICETOPIC/CurrentStatisticsCapability/area:.* area\
-  $\DEVICETOPIC/CurrentStatisticsCapability/time:.* time\
-  $\DEVICETOPIC/ConsumableMonitoringCapability/.* { $TOPIC =~ m,.*\/(.*),; {"$1"=>$EVENT} }\
+  $\DEVICETOPIC/GoToLocationCapability/presets:.* gotoPresets\
+  $\DEVICETOPIC/GoToLocationCapability/start:.* gotoStart\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
-  $\DEVICETOPIC/LocateCapability/locate:.* locate\
   $\DEVICETOPIC/MapData/map-data:.* {}\
   $\DEVICETOPIC/MapData/segments:.* segments\
   $\DEVICETOPIC/StatusStateAttribute/status:.* state\
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
-  $\DEVICETOPIC/WifiConfigurationCapability/.* { $TOPIC =~ m,.*\/(.*),; {"$1"=>$EVENT} }\
-  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* presets\
-  $\DEVICETOPIC/ZoneCleaningCapability/start:.* start
+  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* { $TOPIC =~ m,$DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {"zones"=>valetudo_r($1,$EVENT)} }
 attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
   clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }\
