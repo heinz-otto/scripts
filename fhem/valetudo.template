@@ -1,39 +1,42 @@
 name:valetudo
 filter:TYPE=MQTT2_DEVICE
-desc:use this to control a rooted vacuum with valetudo. For further details visit https://github.com/Hypfer/Valetudo<br><br>NOTE: Initial version
+desc:use this to control a rooted vacuum with valetudo. For further details visit https://github.com/Hypfer/Valetudo<br><br>NOTE: second version
+desc:support https://forum.fhem.de/index.php/topic,121017.0.html
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
 #{ Svn_GetFile("contrib/AttrTemplate/99_valetudoUtils.pm", "FHEM/99_valetudoUtils.pm", sub(){CommandReload(undef, "99_valetudoUtils")}) }
+{ qx(wget -qO FHEM/99_valetudoUtils.pm 'https://github.com/heinz-otto/scripts/edit/master/fhem/valetudo.template');CommandReload(undef, "99_valetudoUtils") }
 deletereading -q DEVICE (?!associatedWith|IODev).*
 attr DEVICE alias DEV_ID
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
 attr DEVICE readingList \
   $\DEVICETOPIC/\x24state:.* _state\
-  $\DEVICETOPIC//(Attach.*|Basic.*|Consum.*|Curr.*|Locate.*|Wifi.*|Zone.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; $1 eq "ips"? {"ipv4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
+  $\DEVICETOPIC/(Att.*|Basic.*|Consum.*|Curr.*|Loc.*|Wifi.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),;; $1 eq "ips"? {"ip4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
   $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
-  $\DEVICETOPIC/GoToLocationCapability/presets:.* gotoPresets\
-  $\DEVICETOPIC/GoToLocationCapability/start:.* gotoStart\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
+  $\DEVICETOPIC/GoToLocationCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {".locations"=>valetudo_r($1,$EVENT),".goto-presets"=>$EVENT} }\
+  $\DEVICETOPIC/GoToLocationCapability/go:.* start\
   $\DEVICETOPIC/MapData/map-data:.* {}\
-  $\DEVICETOPIC/MapData/segments:.* segments\
+  $\DEVICETOPIC/MapData/segments:.* {use JSON;;{".segments" => toJSON{ reverse %{decode_json($EVENT)}}} }\
   $\DEVICETOPIC/StatusStateAttribute/status:.* state\
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
-  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* { $TOPIC =~ m,$DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {"zones"=>valetudo_r($1,$EVENT)} }
+  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),;; {".zones"=>valetudo_r($1,$EVENT),".zone-presets"=>$EVENT} }\
+  $\DEVICETOPIC/ZoneCleaningCapability/start:.* start
 attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
   clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }\
   clean_zone:{valetudo_w($name,"presets")} { valetudo_c($NAME,$EVENT) }\
+  goto:{valetudo_w($name,"locations")} { valetudo_c($NAME,$EVENT) }\
   fanSpeed:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
   waterUsage:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
   x_raw_payload:textField { valetudo_c($NAME,$EVENT) }
-attr DEVICE userReadings ip4:ips:.* {(split ',',ReadingsVal($name,'ips','error'))[0]}
 attr DEVICE event-on-change-reading .*
-attr DEVICE setStateList operation clean_segment clean_zone fanSpeed waterUsage x_raw_payload
-attr DEVICE model valetudo
-setreading DEVICE attrTemplateVersion 20220109 or prior
+attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterUsage locate x_raw_payload
+attr DEVICE model valetudoV2
+setreading DEVICE attrTemplateVersion 20220118
