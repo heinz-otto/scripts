@@ -1,7 +1,7 @@
 #name:valetudo
 name:valetudo-otto
 filter:TYPE=MQTT2_DEVICE
-desc:use this to control a rooted vacuum with valetudo. For further details visit <a href="https://github.com/Hypfer/Valetudo">Hypfer/Valetudo</a><br><br>NOTE: second version support <a href="https://forum.fhem.de/index.php/topic,121017.0.html">Forum Thread</a>
+desc:use this to control a rooted vacuum with valetudo V2. For further details visit <a href="https://github.com/Hypfer/Valetudo">Hypfer/Valetudo</a><br><br>NOTE: second version, details: <a href="https://forum.fhem.de/index.php/topic,121017.0.html">Forum Thread</a>
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
@@ -20,7 +20,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/GoToLocationCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {".locations"=>valetudo_r($1,$EVENT),".goto-presets"=>$EVENT} }\
   $\DEVICETOPIC/GoToLocationCapability/go:.* start\
   $\DEVICETOPIC/MapData/map-data:.* {}\
-  $\DEVICETOPIC/MapData/segments:.* {use JSON;;{".segments" => toJSON{ reverse %{decode_json($EVENT)}}} }\
+  $\DEVICETOPIC/MapData/segments:.* {use JSON;{".segments" => toJSON{ reverse %{decode_json($EVENT)}}} }\
   $\DEVICETOPIC/StatusStateAttribute/status:.* state\
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
