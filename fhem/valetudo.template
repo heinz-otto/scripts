@@ -6,7 +6,7 @@ order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
 #{ Svn_GetFile("contrib/AttrTemplate/99_valetudoUtils.pm", "FHEM/99_valetudoUtils.pm", sub(){CommandReload(undef, "99_valetudoUtils")}) }
-{ qx(wget -qO FHEM/99_valetudoUtils.pm 'https://github.com/heinz-otto/scripts/edit/master/fhem/valetudo.template');CommandReload(undef, "99_valetudoUtils") }
+{ qx(wget -qO FHEM/99_valetudoUtils.pm 'https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/99_valetudoUtils.pm');CommandReload(undef, "99_valetudoUtils") }
 deletereading -q DEVICE (?!associatedWith|IODev).*
 attr DEVICE alias DEV_ID
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
