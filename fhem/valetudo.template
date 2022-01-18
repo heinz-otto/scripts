@@ -1,4 +1,5 @@
-name:valetudo
+#name:valetudo
+name:valetudo-otto
 filter:TYPE=MQTT2_DEVICE
 desc:use this to control a rooted vacuum with valetudo. For further details visit https://github.com/Hypfer/Valetudo<br><br>NOTE: second version
 desc:support https://forum.fhem.de/index.php/topic,121017.0.html
