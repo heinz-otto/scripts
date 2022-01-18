@@ -3,8 +3,8 @@ name:valetudo-otto
 filter:TYPE=MQTT2_DEVICE
 desc:use this to control a rooted vacuum with valetudo V2. For further details visit <a href="https://github.com/Hypfer/Valetudo">Hypfer/Valetudo</a><br><br>NOTE: second version, details: <a href="https://forum.fhem.de/index.php/topic,121017.0.html">Forum Thread</a>
 order:X_03b
-par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,(valetudo)[/].*:, ? $1 : undef }
-par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
+par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,(valetudo)[/].*, ? $1 : undef }
+par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,valetudo[/]([^/]+)[/].*, ? $1 : undef }
 #{ Svn_GetFile("contrib/AttrTemplate/99_valetudoUtils.pm", "FHEM/99_valetudoUtils.pm", sub(){CommandReload(undef, "99_valetudoUtils")}) }
 { qx(wget -qO FHEM/99_valetudoUtils.pm 'https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/99_valetudoUtils.pm');CommandReload(undef, "99_valetudoUtils") }
 deletereading -q DEVICE (?!associatedWith|IODev).*
