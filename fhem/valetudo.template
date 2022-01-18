@@ -1,8 +1,7 @@
 #name:valetudo
 name:valetudo-otto
 filter:TYPE=MQTT2_DEVICE
-desc:use this to control a rooted vacuum with valetudo. For further details visit https://github.com/Hypfer/Valetudo<br><br>NOTE: second version
-desc:support https://forum.fhem.de/index.php/topic,121017.0.html
+desc:use this to control a rooted vacuum with valetudo. For further details visit https://github.com/Hypfer/Valetudo<br><br>NOTE: second version support https://forum.fhem.de/index.php/topic,121017.0.html
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","readingList","") =~ m,(valetudo)[/].*:, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","readingList","") =~ m,valetudo[/]([^/]+)[/].*:, ? $1 : undef }
@@ -14,7 +13,7 @@ attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
 attr DEVICE readingList \
   $\DEVICETOPIC/\x24state:.* _state\
-  $\DEVICETOPIC/(Att.*|Basic.*|Consum.*|Curr.*|Loc.*|Wifi.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),;; $1 eq "ips"? {"ip4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
+  $\DEVICETOPIC/(Att.*|Basic.*|Consum.*|Curr.*|Loc.*|Wifi.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; $1 eq "ips"? {"ip4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
   $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
@@ -26,7 +25,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
-  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),;; {".zones"=>valetudo_r($1,$EVENT),".zone-presets"=>$EVENT} }\
+  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {".zones"=>valetudo_r($1,$EVENT),".zone-presets"=>$EVENT} }\
   $\DEVICETOPIC/ZoneCleaningCapability/start:.* start
 attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
