@@ -21,7 +21,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/GoToLocationCapability/go:.* start\
   $\DEVICETOPIC/MapData/map-data:.* {}\
   $\DEVICETOPIC/MapData/segments:.* .segments\
-  $\DEVICETOPIC/StatusStateAttribute/status:.* state\
+  $\DEVICETOPIC/StatusStateAttribute/status:.* { {"state"=>$EVENT,"cleanerState"=>$EVENT} }\
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
