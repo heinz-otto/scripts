@@ -16,20 +16,7 @@ valetudoUtils_Initialize {
   return;
 }
 # Enter you functions below _this_ line.
-#######
-# return simpel json pairs from presets format of valetudo 
-sub valetudo_r {
-my $setter = shift;
-my $payload = shift;
-my $ret = 'error';
-my %t;
-if ($setter eq 'presets') {
-  my $decoded = decode_json($payload);
-  for (keys %$decoded) { $t{$decoded->{$_}->{'name'}} = $_ } # build a new hash only with names and ids pairs
-  $ret = toJSON(\%t); # result is sorted
-  }
-return $ret
-}
+
 #######
 # return a string for dynamic selection setList (widgets)
 sub valetudo_w {
@@ -37,13 +24,14 @@ my $NAME = shift;
 my $setter = shift;
 # this part reads segments, it's only filled if Provide map data is enabled in connectivity
 if ($setter eq 'segments') {
-  my $json = ReadingsVal($NAME,'.segments','no Segment or not supported');
+  my $json = ReadingsVal($NAME,'.segments','{}');
+  if ($json eq '{}') {$json = '{"1":"no_Segment_or_not_supported"}'};
   my $decoded = decode_json($json);
-  return join ',', sort keys %$decoded
+  return join ',', sort values %$decoded
   }
 # this part read presets which contains a full json for preset zones or locations
 if ($setter eq 'zones' or $setter eq 'locations') {
-  my $json = ReadingsVal($NAME,'.'.$setter,'no Zone or Loaction preset');
+  my $json = valetudo_r('presets',ReadingsVal($NAME,'.'.$setter.'Presets',''));
   my $decoded = decode_json($json);
   return join ',', sort keys %$decoded
   }
@@ -57,6 +45,21 @@ if ($setter eq 'json_segments') {
   for (@array) { $t{$_->{'name'}} = $_->{'id'} }
   return join ',', sort keys %t 
   }
+}
+####### 
+# is now used to pre read the json in valetudo_c
+# return simpel json pairs from presets format of valetudo 
+sub valetudo_r {
+my $setter = shift;
+my $payload = shift;
+my $ret = 'error';
+my %t;
+if ($setter eq 'presets') {
+  my $decoded = decode_json($payload);
+  for (keys %$decoded) { $t{$decoded->{$_}->{'name'}} = $_ } # build a new hash only with names and ids pairs
+  $ret = toJSON(\%t); # result is sorted
+  }
+  return $ret
 }
 #######
 # valetudo_c return a complete string for setList right part
@@ -77,19 +80,19 @@ if ($cmd eq 'clean_segment') {
   my $json = ReadingsVal($NAME,'.segments','');
   my $decoded = decode_json($json);
   my @ids;
-  for ( @rooms ) {push @ids, $decoded->{$_}}
+  for ( @rooms ) { push @ids,{reverse %$decoded}->{$_} }
   my %Hcmd = ( clean_segment => {segment_ids => \@ids,iterations => 1,customOrder => 'true' } );
   $ret = $devicetopic.'/MapSegmentationCapability/clean/set '.toJSON $Hcmd{$cmd}
   }
 
 # this part return the zone/location id according to the selected Name from presets (zones/locations) (more complex json)
 if ($cmd eq 'clean_zone') {
-  my $json = ReadingsVal($NAME,'.zones','');
+  my $json = valetudo_r('presets',ReadingsVal($NAME,'.zonesPresets',''));
   my $decoded = decode_json($json);
   $ret = $devicetopic.'/ZoneCleaningCapability/start/set '.$decoded->{$load}
   }
 if ($cmd eq 'goto') {
-  my $json = ReadingsVal($NAME,'.locations','');
+  my $json = valetudo_r('presets',ReadingsVal($NAME,'.locationsPresets',''));
   my $decoded = decode_json($json);
   $ret = $devicetopic.'/GoToLocationCapability/go/set '.$decoded->{$load}
   }
@@ -112,6 +115,7 @@ if ($cmd eq 'clean_segment_j') {
 
 return $ret
 }
+
 
 ####### Aus dem Forum funktioniert aber nicht
 # Zeigt aber wie man Readings zurück gibt 
