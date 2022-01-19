@@ -37,6 +37,7 @@ attr DEVICE setList \
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
   x_raw_payload:textField { valetudo_c($NAME,$EVENT) }
 attr DEVICE event-on-change-reading .*
+attr DEVICE timestamp-on-change-reading .*
 attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterUsage locate x_raw_payload
 attr DEVICE model valetudoV2
 attr DEVICE stateFormat <a href="http://ip4" target="_blank">state</a>
