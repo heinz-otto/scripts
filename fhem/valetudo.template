@@ -18,7 +18,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
   $\DEVICETOPIC/GoToLocationCapability/presets:.* .locationsPresets\
-  $\DEVICETOPIC/GoToLocationCapability/go:.* start\
+  $\DEVICETOPIC/GoToLocationCapability/go:.* {}\
   $\DEVICETOPIC/MapData/map-data:.* {}\
   $\DEVICETOPIC/MapData/segments:.* .segments\
   $\DEVICETOPIC/StatusStateAttribute/status:.* { {"state"=>$EVENT,"cleanerState"=>$EVENT} }\
@@ -26,7 +26,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
   $\DEVICETOPIC/ZoneCleaningCapability/presets:.* .zonesPresets\
-  $\DEVICETOPIC/ZoneCleaningCapability/start:.* start
+  $\DEVICETOPIC/ZoneCleaningCapability/start:.* {}
 attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
   clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }\
