@@ -31,9 +31,11 @@ if ($setter eq 'segments') {
   }
 # this part read presets which contains a full json for preset zones or locations
 if ($setter eq 'zones' or $setter eq 'locations') {
-  my $json = valetudo_r('presets',ReadingsVal($NAME,'.'.$setter.'Presets',''));
+  my $json = ReadingsVal($NAME,'.'.$setter.'Presets','');
   my $decoded = decode_json($json);
-  return join ',', sort keys %$decoded
+  my @array;
+  for (keys %$decoded) { push @array, $decoded->{$_}->{'name'} }
+  return join',',@array
   }
 # this part is for study purpose to read the full json segments with the REST API like
 # setreading alias=DreameL10pro json_segments {(qx(wget -qO - http://192.168.90.21/api/v2/robot/capabilities/MapSegmentationCapability))}
@@ -45,21 +47,6 @@ if ($setter eq 'json_segments') {
   for (@array) { $t{$_->{'name'}} = $_->{'id'} }
   return join ',', sort keys %t 
   }
-}
-####### 
-# is now used to pre read the json in valetudo_c
-# return simpel json pairs from presets format of valetudo 
-sub valetudo_r {
-my $setter = shift;
-my $payload = shift;
-my $ret = 'error';
-my %t;
-if ($setter eq 'presets') {
-  my $decoded = decode_json($payload);
-  for (keys %$decoded) { $t{$decoded->{$_}->{'name'}} = $_ } # build a new hash only with names and ids pairs
-  $ret = toJSON(\%t); # result is sorted
-  }
-  return $ret
 }
 #######
 # valetudo_c return a complete string for setList right part
@@ -87,14 +74,18 @@ if ($cmd eq 'clean_segment') {
 
 # this part return the zone/location id according to the selected Name from presets (zones/locations) (more complex json)
 if ($cmd eq 'clean_zone') {
-  my $json = valetudo_r('presets',ReadingsVal($NAME,'.zonesPresets',''));
+  my $json = ReadingsVal($NAME,'.zonesPresets','');
   my $decoded = decode_json($json);
-  $ret = $devicetopic.'/ZoneCleaningCapability/start/set '.$decoded->{$load}
+  for (keys %$decoded) { 
+    if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/ZoneCleaningCapability/start/set '.$_ } 
+	}
   }
 if ($cmd eq 'goto') {
-  my $json = valetudo_r('presets',ReadingsVal($NAME,'.locationsPresets',''));
+  my $json = ReadingsVal($NAME,'.locationsPresets','');
   my $decoded = decode_json($json);
-  $ret = $devicetopic.'/GoToLocationCapability/go/set '.$decoded->{$load}
+  for (keys %$decoded) { 
+    if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.$_ } 
+	}
   }
 
 # this part is for study purpose to read the full json segments with the REST API
@@ -114,6 +105,21 @@ if ($cmd eq 'clean_segment_j') {
   }
 
 return $ret
+}
+####### 
+# is never used, was used to pre read the json in valetudo_c
+# return simpel json pairs from presets format of valetudo 
+sub valetudo_r {
+my $setter = shift;
+my $payload = shift;
+my $ret = 'error';
+my %t;
+if ($setter eq 'presets') {
+  my $decoded = decode_json($payload);
+  for (keys %$decoded) { $t{$decoded->{$_}->{'name'}} = $_ } # build a new hash only with names and ids pairs
+  $ret = toJSON(\%t); # result is sorted
+  }
+  return $ret
 }
 
 
