@@ -13,7 +13,7 @@ attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
 attr DEVICE readingList \
   $\DEVICETOPIC/\x24state:.* _state\
-  $\DEVICETOPIC/(Att.*|Basic.*|Consum.*|Curr.*|Loc.*|Wifi.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; $1 eq "ips"? {"ip4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
+  $\DEVICETOPIC/(Att.*|Basic.*|Consum.*|Curr.*|Loc.*|Wifi.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; $1 eq 'ips'? {"ip4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
   $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
