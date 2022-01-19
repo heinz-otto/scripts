@@ -17,15 +17,15 @@ attr DEVICE readingList \
   $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
   $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
   $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
-  $\DEVICETOPIC/GoToLocationCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {".locations"=>valetudo_r($1,$EVENT),".goto-presets"=>$EVENT} }\
+  $\DEVICETOPIC/GoToLocationCapability/presets:.* .locationsPresets\
   $\DEVICETOPIC/GoToLocationCapability/go:.* start\
   $\DEVICETOPIC/MapData/map-data:.* {}\
-  $\DEVICETOPIC/MapData/segments:.* {use JSON;{".segments" => toJSON{ reverse %{decode_json($EVENT)}}} }\
+  $\DEVICETOPIC/MapData/segments:.* .segments\
   $\DEVICETOPIC/StatusStateAttribute/status:.* state\
   $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
   $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
   $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
-  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; {".zones"=>valetudo_r($1,$EVENT),".zone-presets"=>$EVENT} }\
+  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* .zonesPresets\
   $\DEVICETOPIC/ZoneCleaningCapability/start:.* start
 attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
@@ -40,4 +40,4 @@ attr DEVICE event-on-change-reading .*
 attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterUsage locate x_raw_payload
 attr DEVICE model valetudoV2
 attr DEVICE stateFormat <a href="http://ip4" target="_blank">state</a>
-setreading DEVICE attrTemplateVersion 20220118
+setreading DEVICE attrTemplateVersion 20220119
