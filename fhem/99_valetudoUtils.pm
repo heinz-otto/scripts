@@ -115,8 +115,15 @@ my $string = GetHttpFile($ip, '/api/v2/robot/capabilities');
 index($string, $substr) == -1 ? '0':'1';
 }
 #######
-sub CommandAttr_setList {
-
+# add a line to multiline Attribute setList or regList
+# CommandAttr_multiline( 'MQTT2_valetudo_ClumsyQuirkyCattle','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
+sub CommandAttr_multiline {
+my $NAME = shift;
+my $attr = shift;
+my $item = shift;
+if ($attr ne 'setList' and $attr ne 'readingList') {return 'use only for multiline attrib'}
+my $val = AttrVal($NAME,$attr,'')."\n".$item;
+CommandAttr(undef, "$NAME $attr $val");
 }
 
 ################ 
