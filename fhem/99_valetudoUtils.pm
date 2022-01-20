@@ -114,6 +114,10 @@ my $ip=ReadingsVal($NAME,'ip4',(split ',',ReadingsVal($NAME,'ips','error'))[0]);
 my $string = GetHttpFile($ip, '/api/v2/robot/capabilities');
 index($string, $substr) == -1 ? '0':'1';
 }
+#######
+sub CommandAttr_setList {
+
+}
 
 ################ 
 # is never used, was in a first version used to preread the json in valetudo_c
