@@ -103,11 +103,20 @@ if ($cmd eq 'clean_segment_j') {
   my %Hcmd = ( clean_segment => {segment_ids => \@ids,iterations => 1,customOrder => 'true' } );
   $ret = $devicetopic.'/MapSegmentationCapability/clean/set '.toJSON $Hcmd{$cmd}
   }
-
 return $ret
 }
 ####### 
-# is never used, was used to pre read the json in valetudo_c
+# ask the robot via REST API for Featurelist and feature and return true false
+sub valetudo_f {
+my $NAME = shift;   # Devicename of the robot
+my $substr = shift; # requested Feature like GoToLocation or MapSegmentation
+my $ip=ReadingsVal($NAME,'ip4',(split ',',ReadingsVal($NAME,'ips','error'))[0]);
+my $string = GetHttpFile($ip, '/api/v2/robot/capabilities');
+index($string, $substr) == -1 ? '0':'1';
+}
+
+################ 
+# is never used, was in a first version used to preread the json in valetudo_c
 # return simpel json pairs from presets format of valetudo 
 sub valetudo_r {
 my $setter = shift;
