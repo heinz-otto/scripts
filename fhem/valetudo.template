@@ -39,8 +39,8 @@ attr DEVICE timestamp-on-change-reading .*
 attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterUsage locate x_raw_payload
 attr DEVICE model valetudoV2
 attr DEVICE stateFormat <a href="http://ip4" target="_blank">state</a>
-setreading DEVICE attrTemplateVersion 20220119
+setreading DEVICE attrTemplateVersion 20220121
 option:{valetudo_f('MapSegmentation')}
-CommandAttr_multiline( DEVICE,'setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
+{ CommandAttr_multiline( DEVICE,'setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) ) }
 option:{valetudo_f('GoToLocation')}
-CommandAttr_multiline( DEVICE,'setList',q(  goto:{valetudo_w($name,"locations")} { valetudo_c($NAME,$EVENT) }) )
+{ CommandAttr_multiline( DEVICE,'setList',q(  goto:{valetudo_w($name,"locations")} { valetudo_c($NAME,$EVENT) }) ) }
