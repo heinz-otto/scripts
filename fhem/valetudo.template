@@ -29,9 +29,7 @@ attr DEVICE readingList \
   $\DEVICETOPIC/ZoneCleaningCapability/start:.* {}
 attr DEVICE setList \
   operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
-  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }\
   clean_zone:{valetudo_w($name,'zones')} { valetudo_c($NAME,$EVENT) }\
-  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }\
   fanSpeed:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
   waterUsage:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
@@ -42,3 +40,7 @@ attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterU
 attr DEVICE model valetudoV2
 attr DEVICE stateFormat <a href="http://ip4" target="_blank">state</a>
 setreading DEVICE attrTemplateVersion 20220119
+option:{valetudo_f('MapSegmentation')}
+CommandAttr_multiline( DEVICE,'setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
+option:{valetudo_f('GoToLocation')}
+CommandAttr_multiline( DEVICE,'setList',q(  goto:{valetudo_w($name,"locations")} { valetudo_c($NAME,$EVENT) }) )
