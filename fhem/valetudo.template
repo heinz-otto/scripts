@@ -8,7 +8,6 @@ par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal
 # Svn_GetFile() is asynch #{ my $file="99_valetudoUtils.pm"; Svn_GetFile("contrib/AttrTemplate/$file", $file, sub(){CommandReload(undef, $file)}) }
 #{ my $file="99_valetudoUtils.pm"; qx(wget -qO FHEM/$file "https://svn.fhem.de/trac/browser/trunk/fhem/contrib/AttrTemplate/$file?format=txt"); CommandReload(undef, $file) }
 { my $file="99_valetudoUtils.pm"; qx(wget -qO FHEM/$file "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$file"); CommandReload(undef, $file) }
-deletereading -q DEVICE (?!associatedWith|IODev).*
 attr DEVICE alias DEV_ID
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
@@ -45,8 +44,10 @@ attr DEVICE model valetudoV2
 attr DEVICE stateFormat <a href="http://ip4" target="_blank">state</a>
 setreading DEVICE attrTemplateVersion 20220121
 #option:{return valetudo_f('DEVICE','MapSegmentation')}
-option:{return 1}
+option:{1}
 {Log 3,"Support MapSegmentation ".valetudo_f('DEVICE','MapSegmentation')}
+option:{1}
+deletereading -q DEVICE (?!associatedWith|IODev).*
 #{ CommandAttr_multiline( 'DEVICE','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) ) }
 #option:{valetudo_f('DEVICE','GoToLocation')}
 #{ CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,"locations")} { valetudo_c($NAME,$EVENT) }) ) }
