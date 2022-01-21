@@ -5,7 +5,7 @@ desc:use this to control a rooted vacuum with valetudo V2. For further details v
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,([^\/:]+)[\/].*, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[^\/]+\/([^\/:]+).*, ? $1 : undef }
-# Svn_GetFile() is asynch #{ my $file="99_valetudoUtils.pm"; Svn_GetFile("contrib/AttrTemplate/$file", $file, sub(){CommandReload(undef, $file)}) }
+# Svn_GetFile() works asynch #{ my $file="99_valetudoUtils.pm"; Svn_GetFile("contrib/AttrTemplate/$file", $file, sub(){CommandReload(undef, $file)}) }
 #{ my $file="99_valetudoUtils.pm"; qx(wget -qO FHEM/$file "https://svn.fhem.de/trac/browser/trunk/fhem/contrib/AttrTemplate/$file?format=txt"); CommandReload(undef, $file) }
 { my $file="99_valetudoUtils.pm"; qx(wget -qO FHEM/$file "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$file"); CommandReload(undef, $file) }
 attr DEVICE alias DEV_ID
@@ -33,8 +33,8 @@ attr DEVICE setList \
   stop:noArg $\DEVICETOPIC/BasicControlCapability/operation/set STOP\
   charge:noArg $\DEVICETOPIC/BasicControlCapability/operation/set HOME\
   clean_zone:{valetudo_w($name,'zones')} { valetudo_c($NAME,$EVENT) }\
-  fanSpeed:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
-  waterUsage:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
+  fanSpeed:off,min,low,medium,high,turbo,max $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
+  waterUsage:off,min,low,medium,high,turbo,max $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
   x_raw_payload:textField { valetudo_c($NAME,$EVENT) }
 attr DEVICE event-on-change-reading .*
