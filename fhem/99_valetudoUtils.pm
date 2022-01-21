@@ -116,7 +116,7 @@ index($string, $substr) == -1 ? '0':'1';
 }
 #######
 # add a line to multiline Attribute setList or regList
-# CommandAttr_multiline( 'MQTT2_valetudo_ClumsyQuirkyCattle','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
+# CommandAttr_multiline( 'MQTT2_valetudo_xxx','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
 sub CommandAttr_multiline {
 my $NAME = shift;
 my $attr = shift;
