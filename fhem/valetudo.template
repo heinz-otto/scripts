@@ -4,7 +4,7 @@ filter:TYPE=MQTT2_DEVICE
 desc:use this to control a rooted vacuum with valetudo V2. For further details visit <a href="https://github.com/Hypfer/Valetudo">Hypfer/Valetudo</a><br><br>NOTE: second version, details: <a href="https://forum.fhem.de/index.php/topic,121017.0.html">Forum Thread</a>
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,([^\/:]+)[\/].*, ? $1 : undef }
-par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[^\/]+\/([^\/:]+)[\/].*, ? $1 : undef }
+par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[^\/]+\/([^\/:]+).*, ? $1 : undef }
 # Svn_GetFile() is asynch #{ my $file="99_valetudoUtils.pm"; Svn_GetFile("contrib/AttrTemplate/$file", $file, sub(){CommandReload(undef, $file)}) }
 #{ my $file="99_valetudoUtils.pm"; qx(wget -qO FHEM/$file "https://svn.fhem.de/trac/browser/trunk/fhem/contrib/AttrTemplate/$file?format=txt"); CommandReload(undef, $file) }
 { my $file="99_valetudoUtils.pm"; qx(wget -qO FHEM/$file "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$file"); CommandReload(undef, $file) }
