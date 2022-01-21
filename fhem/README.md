@@ -8,5 +8,5 @@ get the template
 ```
 remove template
 ```
-"rm ./FHEM/lib/AttrTemplate/ottos.template";sleep 1;{ AttrTemplate_Initialize() }
+{qx(rm ./FHEM/lib/AttrTemplate/ottos.template");; AttrTemplate_Initialize() }
 ```
