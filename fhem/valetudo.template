@@ -44,7 +44,8 @@ attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterU
 attr DEVICE model valetudoV2
 attr DEVICE stateFormat <a href="http://ip4" target="_blank">state</a>
 setreading DEVICE attrTemplateVersion 20220121
-option:{return valetudo_f('DEVICE','MapSegmentation')}
+#option:{return valetudo_f('DEVICE','MapSegmentation')}
+option:{return 1}
 {Log 3,"Support MapSegmentation ".valetudo_f('DEVICE','MapSegmentation')}
 #{ CommandAttr_multiline( 'DEVICE','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) ) }
 #option:{valetudo_f('DEVICE','GoToLocation')}
