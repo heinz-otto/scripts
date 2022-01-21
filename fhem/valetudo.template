@@ -29,7 +29,10 @@ attr DEVICE readingList \
   $\DEVICETOPIC/ZoneCleaningCapability/presets:.* .zonesPresets\
   $\DEVICETOPIC/ZoneCleaningCapability/start:.* {}
 attr DEVICE setList \
-  operation:PAUSE,START,STOP,HOME   $\DEVICETOPIC/BasicControlCapability/operation/set $EVTPART1\
+  pause:noArg $\DEVICETOPIC/BasicControlCapability/operation/set PAUSE\
+  start:noArg $\DEVICETOPIC/BasicControlCapability/operation/set START\
+  stop:noArg $\DEVICETOPIC/BasicControlCapability/operation/set STOP\
+  charge:noArg $\DEVICETOPIC/BasicControlCapability/operation/set HOME\
   clean_zone:{valetudo_w($name,'zones')} { valetudo_c($NAME,$EVENT) }\
   fanSpeed:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
   waterUsage:off,min,low,medium,high,turbo,max   $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
