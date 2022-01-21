@@ -4,7 +4,7 @@ FHEM command
 
 get the template
 ```
-"wget -qO ./FHEM/lib/AttrTemplate/ottos.template https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/valetudo.template";sleep 5;{ AttrTemplate_Initialize() }
+{qx(wget -qO ./FHEM/lib/AttrTemplate/ottos.template https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/valetudo.template);; AttrTemplate_Initialize() }
 ```
 remove template
 ```
