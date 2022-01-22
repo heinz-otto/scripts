@@ -24,7 +24,11 @@ name:sonos2mqtt_bridge_comfort
 desc:The sonos2mqtt bridge adds 1 notify device for setup speakers, Forum #111711 and Wiki 
 filter:TYPE=MQTT2_DEVICE
 order:M_05c
-{ Svn_GetFile("contrib/AttrTemplate/99_sonos2mqttUtils.pm", "FHEM/99_sonos2mqttUtils.pm", sub(){ CommandReload(undef, "99_sonos2mqttUtils") }) }
+{ $data{f}='99_sonos2mqttUtils.pm';\
+#{$data{u}="https://svn.fhem.de/trac/browser/trunk/fhem/contrib/AttrTemplate/$data{f}?format=txt"}\
+$data{u}="https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}";\
+qx(wget -qO FHEM/$data{f} $data{u}); CommandReload(undef, $data{f});\
+delete $data{f};delete $data{u};''}
 set DEVICE attrTemplate sonos2mqtt_bridge
 attr DEVICE getList Favorites:noArg Favorites {sonos2mqtt($NAME,$EVENT)}
 attr DEVICE setList PauseAll:noArg $\DEVICETOPIC/cmd/pauseall\
