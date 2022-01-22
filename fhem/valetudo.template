@@ -1,7 +1,7 @@
 #name:valetudo
 name:valetudo-otto
 filter:TYPE=MQTT2_DEVICE
-desc:use this to control a rooted vacuum with valetudo V2. For further details visit <a href="https://github.com/Hypfer/Valetudo">Hypfer/Valetudo</a><br><br>NOTE: second version, details: <a href="https://forum.fhem.de/index.php/topic,121017.0.html">Forum Thread</a>
+desc:use this to control a rooted vacuum with valetudo V2. For further details visit <a href="https://github.com/Hypfer/Valetudo">Hypfer/Valetudo</a><br><br>NOTE: tested with Dreame L10pro, Xiaomi Vacuum Gen1, details: <a href="https://forum.fhem.de/index.php/topic,121017.0.html">Forum Thread</a>
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,([^\/:]+)[\/].*, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[^\/]+\/([^\/:]+).*, ? $1 : undef }
