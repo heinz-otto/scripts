@@ -5,12 +5,12 @@ desc:use this to control a rooted vacuum with valetudo V2. For further details v
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,([^\/:]+)[\/].*, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[^\/]+\/([^\/:]+).*, ? $1 : undef }
-{ $data{f}='99_valetudoUtils.pm' }
+{ $data{f}='99_valetudoUtils.pm';'' }
 # Svn_GetFile() works asynch #{ Svn_GetFile("contrib/AttrTemplate/$data{f}", $data{f}, sub(){CommandReload(undef, $data{f})}) }
 #{$data{u}="https://svn.fhem.de/trac/browser/trunk/fhem/contrib/AttrTemplate/$data{f}?format=txt"}
-{ $data{u}="https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}" }
+{ $data{u}="https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}";'' }
 { qx(wget -qO FHEM/$data{f} $data{u}); CommandReload(undef, $data{f}) }
-{delete $data{f};delete $data{u}}
+{delete $data{f};delete $data{u};''}
 attr DEVICE alias DEV_ID
 attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
