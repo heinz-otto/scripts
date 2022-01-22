@@ -35,7 +35,7 @@ if ($setter eq 'zones' or $setter eq 'locations') {
   my $decoded = decode_json($json);
   my @array;
   for (keys %$decoded) { push @array, $decoded->{$_}->{'name'} }
-  return join',',@array
+  return join ',', sort @array
   }
 # this part is for study purpose to read the full json segments with the REST API like
 # setreading alias=DreameL10pro json_segments {(qx(wget -qO - http://192.168.90.21/api/v2/robot/capabilities/MapSegmentationCapability))}
