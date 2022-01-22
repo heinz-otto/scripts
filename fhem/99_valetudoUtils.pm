@@ -235,6 +235,5 @@ Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
   <br>
 </ul>
 
-
 =end html_DE
 =cut
