@@ -88,23 +88,6 @@ if ($cmd eq 'goto') {
 	}
   }
 
-# this part is for study purpose to read the full json segments with the REST API
-# this part return an array of segment id's according to selected Names from json_segments (complex json)
-if ($cmd eq 'clean_segment_j') {
-  $cmd = 'clean_segment';             # only during Test
-  my @rooms = split',', $load;
-  my $json = ReadingsVal($NAME,'json_segments','');
-  my $decoded = decode_json($json);
-  my @array=@{$decoded};
-  my %t;
-  for (@array) { $t{$_->{'name'}} = $_->{'id'} }
-  my @ids;
-  for ( @rooms ) {push @ids, $t{$_}}
-  my %Hcmd = ( clean_segment => {segment_ids => \@ids,iterations => 1,customOrder => 'true' } );
-  $ret = $devicetopic.'/MapSegmentationCapability/clean/set '.toJSON $Hcmd{$cmd}
-  }
-return $ret
-}
 ####### 
 # ask the robot via REST API for Featurelist and feature and return true false
 sub valetudo_f {
@@ -124,22 +107,6 @@ my $item = shift;
 if ($attr ne 'setList' and $attr ne 'readingList') {return 'use only for multiline attrib'}
 my $val = AttrVal($NAME,$attr,'')."\n".$item;
 CommandAttr(undef, "$NAME $attr $val");
-}
-
-################ 
-# is never used, was in a first version used to preread the json in valetudo_c
-# return simpel json pairs from presets format of valetudo 
-sub valetudo_r {
-my $setter = shift;
-my $payload = shift;
-my $ret = 'error';
-my %t;
-if ($setter eq 'presets') {
-  my $decoded = decode_json($payload);
-  for (keys %$decoded) { $t{$decoded->{$_}->{'name'}} = $_ } # build a new hash only with names and ids pairs
-  $ret = toJSON(\%t); # result is sorted
-  }
-  return $ret
 }
 
 1;
