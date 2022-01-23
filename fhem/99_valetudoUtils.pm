@@ -142,54 +142,6 @@ if ($setter eq 'presets') {
   return $ret
 }
 
-
-####### Aus dem Forum funktioniert aber nicht
-# Zeigt aber wie man Readings zurück gibt 
-sub
-valetudo2svg($$$)
-{
-  my ($reading, $d, $filename) = @_;
-  my %ret;
-
-  if(!open FD,">$filename") {
-    $ret{$reading} = "ERROR: $filename: $!";
-    return \%ret;
-  }
-  print FD $d;
-  close(FD);
-  $ret{$reading} = "Wrote $filename";
-  return \%ret;
-
-  if($d !~ m/height":(\d+),"width":(\d+).*?floor":\[(.*\])\]/) {
-    $ret{$reading} = "ERROR: Unknown format";
-    return \%ret;
-  }
-  my ($w,$h,$nums) = ($1, $2, $3);
-
-  my $svg=<<"EOD";
-<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="$w" height="$h" viewBox="0 0 $w $h">
-<g fill="#000000" stroke="none">
-  <rect x="0" y="0" width="$w" height="$h" stroke="black" stroke-width="1" fill="none"/>
-EOD
-
-  $nums =~ s/\[(\d+),(\d+)\]/
-    $svg .= "<rect x=\"$1\" y=\"$2\" width=\"1\" height=\"1\"\/>\n";
-    ""
-  /xge;
-  $svg .= "</g></svg>";
-
-  if(!open FD,">$filename") {
-    $ret{$reading} = "ERROR: $filename: $!";
-    return \%ret;
-  }
-  print FD $svg;
-  close(FD);
-  $ret{$reading} = "Wrote $filename";
-  return \%ret;
-}
-
 1;
 =pod
 =item summary    generic MQTT2 vacuum valetudo Device
