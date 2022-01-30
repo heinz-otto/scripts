@@ -1,0 +1,39 @@
+# create additional wifi network
+ssid='MyWlan2'
+key='MySecurePassword2'
+IP='192.168.3.1'      # IP for additonal wifi 
+uci batch << EOI
+# /etc/config/network
+# interface
+set network.${ssid}=interface
+set network.${ssid}.proto='static'
+set network.${ssid}.ipaddr=$IP
+set network.${ssid}.netmask='255.255.255.0'
+set network.${ssid}.device="br-${ssid}"
+# Bridge Device
+set network.${ssid}_dev="device" 
+set network.${ssid}_dev.type='bridge'
+set network.${ssid}_dev.name="br-${ssid}"
+# /etc/config/wireless
+set wireless.${ssid}=wifi-iface
+set wireless.${ssid}.device='radio0'
+set wireless.${ssid}.mode='ap'
+set wireless.${ssid}.ssid=${ssid}
+set wireless.${ssid}.encryption='psk2'
+set wireless.${ssid}.key=${key}
+set wireless.${ssid}.network=${ssid}
+set wireless.${ssid}.disabled='1'
+# /etc/config/dhcp
+set dhcp.${ssid}=dhcp
+set dhcp.${ssid}.interface=${ssid}
+set dhcp.${ssid}.start='100'
+set dhcp.${ssid}.limit='150'
+set dhcp.${ssid}.leasetime='12h'
+# /etc/config/firewall
+add_list firewall.@zone[0].network=${ssid}
+EOI
+# activate radio0 if disabled
+# uci -q get wireless.radio0.disabled && uci del wireless.radio0.disabled
+# commit
+uci commit
+reload_config
