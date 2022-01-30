@@ -1,3 +1,4 @@
+# Variante geradeaus
 uci batch << EOI
 add network device
 set network.@device[-1].type='bridge'
@@ -26,6 +27,7 @@ add_list network.@bridge-vlan[-1].ports='lan2:u*'
 add_list network.@bridge-vlan[-1].ports='lan3:u*'
 EOI
 
+# Variante mit for schleifen und arrays
 uci batch << EOI
 add network device
 set network.@device[-1].type='bridge'
@@ -50,5 +52,3 @@ do
 uci add_list network.@bridge-vlan[-1].ports=$port
 done
 done
-
-arr=$arr" $(uci add network switch_vlan)"
