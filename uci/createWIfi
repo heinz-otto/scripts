@@ -36,4 +36,4 @@ EOI
 # uci -q get wireless.radio0.disabled && uci del wireless.radio0.disabled
 # commit
 uci commit
-reload_config
+wifi reload
