@@ -1,0 +1,8 @@
+uci batch << EOI
+set network.wan.metric='20'
+set network.wan6.metric='20'
+set network.wanb.metric='10'
+set network.wanb6.metric='10'
+commit
+EOI
+reload_config
