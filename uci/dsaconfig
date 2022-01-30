@@ -1,3 +1,5 @@
+# Das sind alles nur Ideen und nur teilweise getestet
+
 # Variante geradeaus
 uci batch << EOI
 add network device
