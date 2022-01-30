@@ -35,20 +35,39 @@ set network.@device[-1].name='br2'
 EOI
 for port in lan1 lan2 lan3 lan4 wan
 do
-uci add_list network.@device[-1].ports=$port
+  uci add_list network.@device[-1].ports=$port
+done
+#### Alternative 1
+for vlanid in 2 3 4
+do
+  [ $vlanid -eq 2 ] && ports='lan3:u*'
+  [ $vlanid -eq 3 ] && ports='lan1:u* wan:u*'
+  [ $vlanid -eq 4 ] && ports='lan2:u* lan3:u*'
+  uci add network bridge-vlan
+  uci set network.@bridge-vlan[-1].device='br2'
+  uci set network.@bridge-vlan[-1].vlan=$vlanid
+  for port in $ports
+  do
+    uci add_list network.@bridge-vlan[-1].ports=$port
+  done
 done
 
+#### Alternative 2
 arr=
 for vlanid in 2 3 4
 do
-[ $vlanid -eq 2 ] && ports='lan3:u*'
-[ $vlanid -eq 3 ] && ports='lan1:u* wan:u*'
-[ $vlanid -eq 4 ] && ports='lan2:u* lan3:u*'
-arr=$arr" $(uci add network bridge-vlan)"
-uci set network.@bridge-vlan[-1].device='br2'
-uci set network.@bridge-vlan[-1].vlan=$vlanid
-for port in $ports
-do
-uci add_list network.@bridge-vlan[-1].ports=$port
+  arr=$arr" $(uci add network bridge-vlan)"
+  uci set network.@bridge-vlan[-1].device='br2'
+  uci set network.@bridge-vlan[-1].vlan=$vlanid
 done
+for id in $arr
+do
+  vlanid=$(uci get network.$id.vlan)
+  [ $vlanid -eq 2 ] && ports='lan3:u*'
+  [ $vlanid -eq 3 ] && ports='lan1:u* wan:u*'
+  [ $vlanid -eq 4 ] && ports='lan2:u* lan3:u*'
+  for port in $ports
+  do
+    uci add_list network.$id.ports=$port
+  done
 done
