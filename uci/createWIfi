@@ -1,3 +1,21 @@
+###############
+ssid='ssid'
+key='password'
+# count the the number of existing wifi networks
+wifinet='wifinet'$(uci export wireless|grep -c wifi-iface)
+# if network still exist take a new name
+uci get wireless.${wifinet}.ssid && wifinet='wi'$(date +%s)
+
+uci batch << EOI
+  set wireless.$wifinet=wifi-iface
+  set wireless.$wifinet.device='radio0'
+  set wireless.$wifinet.mode='ap'
+  set wireless.$wifinet.ssid=$ssid
+  set wireless.$wifinet.encryption='sae'
+  set wireless.$wifinet.key=$key
+  set wireless.$wifinet.network='lan'
+EOI
+
 # create additional wifi network
 ssid='MyWlan2'
 key='MySecurePassword2'
@@ -37,3 +55,4 @@ EOI
 # commit
 uci commit
 wifi reload
+
