@@ -1,4 +1,7 @@
 ###############
+# add a new wifi ap to an existing network interface (lan) to radio0
+# strong encryption wpa3 sae is used
+# the wifi-iface have to be named
 ssid='ssid'
 key='password'
 # count the the number of existing wifi networks
