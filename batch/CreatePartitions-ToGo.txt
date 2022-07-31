@@ -22,13 +22,15 @@ rem == 3. Windows partition ========================
 rem ==    a. Create the Windows partition ==========
 create partition primary 
 rem ==    b. Create space for the Second Os ===
-shrink minimum=150000
+shrink desired=150000
 rem ==    c. Prepare the Windows partition ========= 
-format quick fs=ntfs label="Windows"
+format quick fs=ntfs label="WindowsPro"
 assign letter="W"
 rem === 4. Second OS partition ================
 create partition primary
-format quick fs=ntfs label="SecondOS"
+rem ==  Create some space  ===
+shrink desired=50000
+format quick fs=ntfs label="WindowsHome"
 assign letter="R"
 list volume
 exit
