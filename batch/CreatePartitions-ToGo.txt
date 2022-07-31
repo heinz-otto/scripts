@@ -1,9 +1,12 @@
-rem == CreatePartitions-UEFI.txt ==
+rem == CreatePartitions-ToGo.txt ==
 rem == These commands are used with DiskPart to
 rem    create four partitions
 rem    for a UEFI/GPT-based PC.
 rem    Adjust the partition sizes to fill the drive
 rem    as necessary. ==
+list disk
+rem == modify the Script and remove the following exit ==
+exit
 select disk 3
 clean
 convert gpt
