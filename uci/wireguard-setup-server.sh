@@ -43,7 +43,7 @@ uci set firewall.wg.dest_port="${WG_PORT}"
 uci set firewall.wg.proto="udp"
 uci set firewall.wg.target="ACCEPT"
 uci commit firewall
-service firewall restart
+/etc/init.d/firewall restart
 
 # Configure network
 uci -q delete network.${WG_IF}
