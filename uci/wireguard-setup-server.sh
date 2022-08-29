@@ -1,25 +1,34 @@
 #!/bin/ash
+# usage: ./wireguard-setup-server.sh KEY ADDR PORT IFname
+# usage with pipe: echo "KEY ADDR PORT IFname"|xargs ./wireguard-setup-server.sh
+
+# Configuration parameters, read from input or setting defaults
+WG_KEY=$1
+WG_ADDR=$2; [ -z "${WG_ADDR}" ] && WG_ADDR="192.168.9.1/24"
+WG_PORT=$3; [ -z "${WG_PORT}" ] && WG_PORT="51820"
+WG_IF=$4 ;  [ -z "${WG_IF}" ] && WG_IF="vpn"
+WG_ADDR6="fdf1:e8a1:8d3f:9::1/64"
+# base path for confing & key files if exists
+WG_DIR="/etc/wireguard" 
+WG_CONFIGS="configs"
+WG_KEYS="keys"
+
 # Install packages
 opkg update
 opkg install wireguard-tools luci-app-wireguard luci-proto-wireguard 
 #optional 
 opkg install qrencode nano tcpdump-mini
 
-# Configuration parameters
-WG_IF="vpn"
-WG_PORT="51820"
-WG_ADDR="192.168.9.1/24"
-WG_ADDR6="fdf1:e8a1:8d3f:9::1/64"
-
-# Generate keys
-if [ ! -f ./*.key ]; then 
-  echo 'Erzeuge keys'
-  umask go=
-  wg genkey | tee wgserver.key | wg pubkey > wgserver.pub
+# read or generate servers private key
+if [ -z ${WG_KEY} ]; then
+    if [ -f "${WG_DIR}/${WG_KEYS}/wgserver.key" ]; then 
+      echo 'read key from file'
+      WG_KEY=$(cat "${WG_DIR}/${WG_KEYS}/wgserver.key")
+	else
+      echo 'create new key'
+      WG_KEY=$(wg genkey)
+	fi
 fi
-
-# Server private key
-WG_KEY="$(cat wgserver.key)"
 
 # Configure firewall
 uci rename firewall.@zone[0]="lan"
