@@ -8,7 +8,8 @@ WG_KEY=$1
 WG_ADDR=$2; [ -z "${WG_ADDR}" ] && WG_ADDR="192.168.9.1/24"
 WG_PORT=$3; [ -z "${WG_PORT}" ] && WG_PORT="51820"
 WG_IF=$4 ;  [ -z "${WG_IF}" ] && WG_IF="vpn"
-WG_ADDR6="fdf1:e8a1:8d3f:9::1/64"
+WG_SUB=${WG_ADDR%/*}; WG_SUB=${WG_SUB%.*}; WG_SUB=${WG_SUB#*.*.}
+WG_ADDR6=$5; WG_ADDR6=${WG_ADDR6:="fdf1:e8a1:8d3f:${WG_SUB}::1/64"} 
 # base path for confing & key files if exists
 WG_DIR="/etc/wireguard" 
 WG_CONFIGS="configs"
