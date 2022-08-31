@@ -15,10 +15,14 @@ WG_CONFIGS="configs"
 WG_KEYS="keys"
 
 # Install packages
-opkg update
-opkg install wireguard-tools luci-app-wireguard luci-proto-wireguard 
-#optional 
-opkg install qrencode nano tcpdump-mini
+if [ -z $(opkg list-installed|grep -o kmod-wireguard) ]; then
+    opkg update
+    opkg install wireguard-tools luci-app-wireguard luci-proto-wireguard 
+    #optional 
+    opkg install qrencode nano tcpdump-mini
+ else
+    echo "software already installed"
+fi
 
 # read or generate servers private key
 if [ -z ${WG_KEY} ]; then
@@ -31,6 +35,7 @@ if [ -z ${WG_KEY} ]; then
 	fi
 fi
 
+################# not usable for more than one wg interface
 # Configure firewall
 uci rename firewall.@zone[0]="lan"
 uci rename firewall.@zone[1]="wan"
