@@ -1,4 +1,5 @@
 #!/bin/ash
+# Code is based on https://openwrt.org/docs/guide-user/services/vpn/wireguard/server
 # usage: ./wireguard-setup-server.sh KEY ADDR PORT IFname
 # usage with pipe: echo "KEY ADDR PORT IFname"|xargs ./wireguard-setup-server.sh
 
@@ -55,5 +56,4 @@ uci set network.${WG_IF}.mtu='1420'
 uci add_list network.${WG_IF}.addresses="${WG_ADDR}"
 uci add_list network.${WG_IF}.addresses="${WG_ADDR6}"
 uci commit network
-# service network restart - doesnt work at this point
 /etc/init.d/network restart
