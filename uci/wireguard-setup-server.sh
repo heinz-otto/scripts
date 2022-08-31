@@ -4,16 +4,16 @@
 # usage with pipe: echo "KEY ADDR PORT IFname"|xargs ./wireguard-setup-server.sh
 
 # Configuration parameters, read from input or setting defaults
+# if parameter is empty the string is expanded https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 WG_KEY=$1
-WG_ADDR=$2; [ -z "${WG_ADDR}" ] && WG_ADDR="192.168.9.1/24"
-WG_PORT=$3; [ -z "${WG_PORT}" ] && WG_PORT="51820"
-WG_IF=$4 ;  [ -z "${WG_IF}" ] && WG_IF="vpn"
+WG_ADDR=${2:-"192.168.9.1/24"}
+WG_PORT=${3:-"51820"}
+WG_IF=${4:-"vpn"}
 WG_SUB=${WG_ADDR%/*}; WG_SUB=${WG_SUB%.*}; WG_SUB=${WG_SUB#*.*.}
-WG_ADDR6=$5; WG_ADDR6=${WG_ADDR6:="fdf1:e8a1:8d3f:${WG_SUB}::1/64"} 
+WG_ADDR6=${5:-"fdf1:e8a1:8d3f:${WG_SUB}::1/64"}
 # base path for confing & key files if exists
 WG_DIR="/etc/wireguard" 
-WG_CONFIGS="configs"
-WG_KEYS="keys"
+WG_DIR_KEYS="${WG_DIR}/keys"
 
 # Install packages
 if [ -z $(opkg list-installed|grep -o kmod-wireguard) ]; then
@@ -25,18 +25,18 @@ if [ -z $(opkg list-installed|grep -o kmod-wireguard) ]; then
     echo "software already installed"
 fi
 
-# read or generate servers private key
+# read or generate servers private key, a new key will only saved in the config
 if [ -z ${WG_KEY} ]; then
-    if [ -f "${WG_DIR}/${WG_KEYS}/wgserver.key" ]; then 
+    if [ -f "${WG_DIR_KEYS}/wgserver.key" ]; then 
       echo 'read key from file'
-      WG_KEY=$(cat "${WG_DIR}/${WG_KEYS}/wgserver.key")
+      WG_KEY=$(cat "${WG_DIR_KEYS}/wgserver.key")
     else
       echo 'create new key'
       WG_KEY=$(wg genkey)
     fi
 fi
 
-################# not usable for more than one wg interface
+################# firewall rule is not usable for more than one wg interface - todo!
 # Configure firewall
 uci rename firewall.@zone[0]="lan"
 uci rename firewall.@zone[1]="wan"
