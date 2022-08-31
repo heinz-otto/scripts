@@ -1,4 +1,5 @@
 #!/bin/ash
+# Code is inspired from https://openwrt.org/docs/guide-user/services/vpn/wireguard/start
 # usage:
 # ./wireguard-export-key.sh                # export all peers
 # ./wireguard-export-key.sh <PublicKey>    # export config for PublicKey
