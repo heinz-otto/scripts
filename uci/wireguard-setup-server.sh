@@ -29,10 +29,10 @@ if [ -z ${WG_KEY} ]; then
     if [ -f "${WG_DIR}/${WG_KEYS}/wgserver.key" ]; then 
       echo 'read key from file'
       WG_KEY=$(cat "${WG_DIR}/${WG_KEYS}/wgserver.key")
-	else
+    else
       echo 'create new key'
       WG_KEY=$(wg genkey)
-	fi
+    fi
 fi
 
 ################# not usable for more than one wg interface
