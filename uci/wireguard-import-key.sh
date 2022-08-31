@@ -22,9 +22,9 @@ AllowedIPs=$4
 WG_PORT=$(uci get network.${WG_IF}.listen_port)
 WG_ADDR=$(uci get network.${WG_IF}.addresses|awk '{print $1}')
 WG_ADDR6=$(uci get network.${WG_IF}.addresses|awk '{print $2}')
-WG_ADDR=${WG_ADDR%/*} # Maske abtrennen
 
 #get the highest last digit number from the IPv4 Address Field inside all configured peers 
+WG_ADDR=${WG_ADDR%/*} # strip network mask
 peer_IP=$(uci show network|grep wireguard_${WG_IF}....allowed_ips|cut -d= -f2|sort -V|tail -1| cut -d '.' -f 4 | cut -d '/' -f 1)
 [ -z $peer_IP ] && peer_IP=${WG_ADDR#*.*.*.}  
 # next digit
