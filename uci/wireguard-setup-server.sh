@@ -37,13 +37,12 @@ if [ -z ${WG_KEY} ]; then
     fi
 fi
 
-################# firewall rule is not usable for more than one wg interface - todo!
 # Configure firewall
 uci rename firewall.@zone[0]="lan"
 uci rename firewall.@zone[1]="wan"
 uci del_list firewall.lan.network="${WG_IF}"
 uci add_list firewall.lan.network="${WG_IF}"
-### old version for wg port rule
+### old version for wg port rule # this part of script was not usable for more than one wg interface - todo!
 # uci -q delete firewall.wg
 # uci set firewall.wg="rule"
 # uci set firewall.wg.name="Allow-WireGuard-${WG_IF}"
@@ -51,7 +50,11 @@ uci add_list firewall.lan.network="${WG_IF}"
 # uci set firewall.wg.dest_port="${WG_PORT}"
 # uci set firewall.wg.proto="udp"
 # uci set firewall.wg.target="ACCEPT"
-# new version for wg port rule
+# new version for wg port rule 
+# delete existing rule # awk trennt am Punkt, sucht im Part3 den match und gibt Part 1 und 2 mit Punkt getrennt wieder aus
+for rule in $(uci show firewall|awk -F. 'match($3,/Allow-WireGuard-'$WG_IF'/) { print $1"."$2 }') ; do
+   uci -q delete $rule
+done
 uci add firewall rule
 uci set firewall.@rule[-1].name="Allow-WireGuard-${WG_IF}"
 uci set firewall.@rule[-1].src='wan'
