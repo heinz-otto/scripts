@@ -36,13 +36,16 @@ function export_all () {
 
 function print_config () {
 WG_PUB=$1
+# ToDo
+# Suche nach Textketten: search=Otto; uci show network|awk -F. 'match($3,/'$search'/) { print $1"."$2 }' 
+# funktioniert nicht mit keys wegen sonderzeichen
 i=
 # get index for given public key
 for index in $( uci show network | grep -oE "wireguard_${WG_IF}\[\d+\].public_key"|grep -oE "\[\d+\]"|grep -oE '\d+' ) ;do
    key=$(uci get network.@wireguard_${WG_IF}[$index].public_key)
    [ "$key" = "$WG_PUB" ] && i=$index
 done 
-#ToDo
+#ToDo 
 if [ -z ${i} ];then echo 'config not found';exit;fi
 
 WG_IPS=$( uci get network.@wireguard_${WG_IF}[$i].allowed_ips|tr ' ' ',' )
