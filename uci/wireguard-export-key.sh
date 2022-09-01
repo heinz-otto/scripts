@@ -5,6 +5,7 @@
 # ./wireguard-export-key.sh <PublicKey>    # export config for PublicKey
 # ToDo: function usage einbauen, Code noch ordnen
 
+# process commandline arguments
 qr=
 while [ "$1" != "" ]; do
     case $1 in
