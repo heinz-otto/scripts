@@ -51,7 +51,8 @@ WG_PORT=$( uci get network.${WG_IF}.listen_port )
 username=$( uci -q get network.@wireguard_${WG_IF}[$i].description )
 
 # output config
-printf "\n########## config for peer ${username:-noname}\n"
+printf "\n########## config for peer ${username:-noname} ##########\n"
+# begin heredoc read into variable
 read -r -d '' WG_CLIENT_CONFIG <<-EOF
 [Interface]
 Address = ${WG_ADDR}
@@ -63,7 +64,7 @@ AllowedIPs = ${WG_IPS}
 Endpoint = ${WG_HOST}:${WG_PORT}
 $( [ -z ${WG_PSK} ] || echo PresharedKey = ${WG_PSK} )
 EOF
-
+# end heredoc
 if [ "$qr" = "1" ]; then
   qrencode -t ansiutf8 "$WG_CLIENT_CONFIG"
 else
