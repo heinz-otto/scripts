@@ -3,6 +3,7 @@
 # usage:
 # ./wireguard-export-key.sh                # export all peers
 # ./wireguard-export-key.sh <PublicKey>    # export config for PublicKey
+# ToDo: qrencode outout like: qrencode -t ansiutf8 < /etc/wireguard/clients/mobile.conf
 
 WG_PUB=$1
 # Configuration parameters
