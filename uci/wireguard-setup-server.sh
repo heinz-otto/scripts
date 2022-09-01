@@ -43,13 +43,21 @@ uci rename firewall.@zone[0]="lan"
 uci rename firewall.@zone[1]="wan"
 uci del_list firewall.lan.network="${WG_IF}"
 uci add_list firewall.lan.network="${WG_IF}"
-uci -q delete firewall.wg
-uci set firewall.wg="rule"
-uci set firewall.wg.name="Allow-WireGuard-${WG_IF}"
-uci set firewall.wg.src="wan"
-uci set firewall.wg.dest_port="${WG_PORT}"
-uci set firewall.wg.proto="udp"
-uci set firewall.wg.target="ACCEPT"
+### old version for wg port rule
+# uci -q delete firewall.wg
+# uci set firewall.wg="rule"
+# uci set firewall.wg.name="Allow-WireGuard-${WG_IF}"
+# uci set firewall.wg.src="wan"
+# uci set firewall.wg.dest_port="${WG_PORT}"
+# uci set firewall.wg.proto="udp"
+# uci set firewall.wg.target="ACCEPT"
+# new version for wg port rule
+uci add firewall rule
+uci set firewall.@rule[-1].name="Allow-WireGuard-${WG_IF}"
+uci set firewall.@rule[-1].src='wan'
+uci set firewall.@rule[-1].dest_port="${WG_PORT}"
+uci set firewall.@rule[-1].proto='udp'
+uci set firewall.@rule[-1].target='ACCEPT'
 uci commit firewall
 /etc/init.d/firewall restart
 
