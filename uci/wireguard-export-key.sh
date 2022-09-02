@@ -22,7 +22,7 @@ function print_config () {
 
         # output config
         printf "\n########## config for peer ${username:-noname} ##########\n"
-        # begin heredoc read into variable
+        # begin heredoc read into variable - importend: there must be tabs in front of heredoc lines!
         read -r -d '' WG_CLIENT_CONFIG <<-EOF
         [Interface]
         Address = ${WG_ADDR}
@@ -45,7 +45,7 @@ function print_config () {
 }
 
 function export_all () {
-  # read all public keys in config 
+  # read all public keys in OpenWrt config 
   for i in $( uci show network | grep -oE "wireguard_${WG_IF}\[\d+\].public_key"|grep -oE "\[\d+\]"|grep -oE '\d+' ) ;do
      print_config $( uci get network.@wireguard_${WG_IF}[$i].public_key )
   done 
@@ -68,6 +68,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
+# main loop over all wireguard interfaces
 for WG_IF in $(uci show network|grep proto=.wireguard| cut -d '.' -f 2); do 
     echo "interface $WG_IF"
     WG_PORT=$( uci get network.${WG_IF}.listen_port )
