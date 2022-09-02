@@ -3,10 +3,10 @@
 
 # functions
 function usage () {
-   echo "./wireguard-export-key.sh [searchword] [-qr|-h|--help|--qrencode]"
-   echo "./wireguard-export-key.sh                # export all peers"
-   echo "./wireguard-export-key.sh <PublicKey>    # export config for PublicKey"
-   echo "./wireguard-export-key.sh ConfigName -qr # export config for ConfigName as QR Code"
+   echo "${0##*/} [searchword] [-qr|-h|--help|--qrencode]"
+   echo "${0##*/}                # export all peers"
+   echo "${0##*/} <PublicKey>    # export config for PublicKey"
+   echo "${0##*/} ConfigName -qr # export config for ConfigName as QR Code"
 }
 
 function print_config () {
