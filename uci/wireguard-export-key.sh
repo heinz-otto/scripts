@@ -1,11 +1,14 @@
 #!/bin/ash
 # Code is inspired from https://openwrt.org/docs/guide-user/services/vpn/wireguard/start
-# usage:
-# ./wireguard-export-key.sh                # export all peers
-# ./wireguard-export-key.sh <PublicKey>    # export config for PublicKey
-# ToDo: function usage einbauen, Code noch ordnen
 
 # functions
+function usage () {
+   echo "./wireguard-export-key.sh [searchword] [-qr|-h|--help|--qrencode]"
+   echo "./wireguard-export-key.sh                # export all peers"
+   echo "./wireguard-export-key.sh <PublicKey>    # export config for PublicKey"
+   echo "./wireguard-export-key.sh ConfigName -qr # export config for ConfigName as QR Code"
+}
+
 function print_config () {
   search=${1//[+=\/]/.}                                # replace base64 special chars with single . for awk regExp search
   for section in $(uci show network |grep "wireguard_${WG_IF}" |awk -F. 'match($3,/'${search}'/) { print $1"."$2 }'); do
@@ -48,14 +51,7 @@ function export_all () {
   done 
 }
 
-function usage () {
-   echo "./wireguard-export-key.sh [searchword] [-qr|-h|--help|--qrencode]"
-   echo "./wireguard-export-key.sh                # export all peers"
-   echo "./wireguard-export-key.sh <PublicKey>    # export config for PublicKey"
-   echo "./wireguard-export-key.sh ConfigName -qr # export config for ConfigName as QR Code"
-}
-
-# main, if no argument than export all
+# main
 WG_HOST=$( ip addr show $( uci get network.wan.device ) | grep 'inet '|grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'|head -1 )
 
 # process commandline arguments
