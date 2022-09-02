@@ -7,17 +7,16 @@
 
 # functions
 function print_config () {
-  search=${1//[+=\/]/.}    # replace base64 special chars with single . for regExp search
-  for section in $(uci show network |grep -oE "wireguard_${WG_IF}" |awk -F. 'match($3,/'${search}'/) { print $1"."$2 }'); do
+  search=${1//[+=\/]/.}                                # replace base64 special chars with single . for awk regExp search
+  for section in $(uci show network |grep "wireguard_${WG_IF}" |awk -F. 'match($3,/'${search}'/) { print $1"."$2 }'); do
     if [ -z ${section} ];then 
-       echo "config for the word ${search} not found"
+       echo "the word ${search} not found in config"
     else
         WG_IPS=$( uci get ${section}.allowed_ips|tr ' ' ',' )
         WG_ADDR=$( uci get ${section}.allowed_ips|cut -d ' ' -f 1 )
         WG_PSK=$( uci -q get ${section}.preshared_key )
         username=$( uci -q get ${section}.description )
 
-        WG_PORT=$( uci get network.${WG_IF}.listen_port )
         # output config
         printf "\n########## config for peer ${username:-noname} ##########\n"
         # begin heredoc read into variable
@@ -32,6 +31,7 @@ function print_config () {
         $( [ -z ${WG_PSK} ] || echo PresharedKey = ${WG_PSK} )
         EOF
         # end heredoc
+
         if [ "$qr" = "1" ]; then
           qrencode -t ansiutf8 "$WG_CLIENT_CONFIG"
         else
@@ -42,9 +42,17 @@ function print_config () {
 }
 
 function export_all () {
+  # read all public keys in config 
   for i in $( uci show network | grep -oE "wireguard_${WG_IF}\[\d+\].public_key"|grep -oE "\[\d+\]"|grep -oE '\d+' ) ;do
      print_config $( uci get network.@wireguard_${WG_IF}[$i].public_key )
   done 
+}
+
+function usage () {
+   echo "./wireguard-export-key.sh [searchword] [-qr|-h|--help|--qrencode]"
+   echo "./wireguard-export-key.sh                # export all peers"
+   echo "./wireguard-export-key.sh <PublicKey>    # export config for PublicKey"
+   echo "./wireguard-export-key.sh ConfigName -qr # export config for ConfigName as QR Code"
 }
 
 # main, if no argument than export all
@@ -56,7 +64,7 @@ while [ "$1" != "" ]; do
     case $1 in
         -qr | --qrencode )      qr=1
                                 ;;
-        -h | --help )           echo Help #usage
+        -h | --help )           usage
                                 exit
                                 ;;
         * )                     WG_PUB=$1
