@@ -1,7 +1,8 @@
 Here some Scripts for special OpenWrt with busybox and uci environment. Note: shell is ash,  wget is only uclient-fetch and shell parameter expansion is limited
 # Manage wireguard setup on OpenWrt
-Setup software for wireguard Server and generate intreface with defaults - according to the proposal from [OpenWrt Wiki ](https://openwrt.org/docs/guide-user/services/vpn/wireguard/server)
-generate new private KEY, IP=192.168.9.1, Port=51820, NAME=vpn
+Make a complete setup: install software for wireguard Server and generate an interface with defaults - according to the proposal from [OpenWrt Wiki ](https://openwrt.org/docs/guide-user/services/vpn/wireguard/server)
+
+privateKEY, IP=192.168.9.1, Port=51820, IFname=vpn
 ```
 ./wireguard-setup-server.sh
 ./wireguard-setup-server.sh $(wg genkey) '10.6.0.1' 51821 wg0
