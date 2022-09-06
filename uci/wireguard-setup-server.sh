@@ -2,7 +2,7 @@
 # Code is based on https://openwrt.org/docs/guide-user/services/vpn/wireguard/server
 # usage: ./wireguard-setup-server.sh KEY ADDR PORT IFname
 # usage with pipe: echo "KEY ADDR PORT IFname"|xargs ./wireguard-setup-server.sh
-# create new wireguard server interface ./wireguard-setup-server.sh $(wg genkey) "192.168.10.1" 51830 vpn10
+# create new wireguard server interface ./wireguard-setup-server.sh $(wg genkey) "192.168.10.1/24" 51830 vpn10
 
 # Configuration parameters, read from input or setting defaults
 # if parameter is empty the string is expanded https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
