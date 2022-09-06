@@ -1,6 +1,9 @@
 #!/bin/sh
 # Code is inspired from https://openwrt.org/docs/guide-user/services/vpn/wireguard/start
 
+WG_DIR="/etc/wireguard" 
+WG_DIR_KEYS="${WG_DIR}/keys"
+
 # functions
 function usage () {
    echo "${0##*/} [searchword] [-qr|-h|--help|--qrencode]"
@@ -26,7 +29,7 @@ function print_config () {
         read -r -d '' WG_CLIENT_CONFIG <<-EOF
 	[Interface]
 	Address = ${WG_ADDR}
-	PrivateKey = $(cat /etc/wireguard/keys/${username}_priv 2> /dev/null || echo private key not found)
+	PrivateKey = $(cat ${WG_DIR_KEYS}/${username}_priv 2> /dev/null || echo private key not found)
 	[Peer]
 	PublicKey = $(uci get network.${WG_IF}.private_key|wg pubkey)
 	AllowedIPs = ${WG_IPS}
