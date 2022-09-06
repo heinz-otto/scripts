@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/sh
 # Code is inspired from https://openwrt.org/docs/guide-user/services/vpn/wireguard/start
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 
