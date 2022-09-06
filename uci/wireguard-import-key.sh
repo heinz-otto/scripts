@@ -10,6 +10,8 @@ if [ -z "$1" ]; then
 fi
 
 # Configuration parameters
+WG_DIR="/etc/wireguard" 
+WG_DIR_KEYS="${WG_DIR}/keys"
 # WG_IF="vpn"           # interfacename to add client configs
 # if more than one wireguard interface - the last one will win
 for WG_IF in $(uci show network|grep proto=.wireguard| cut -d '.' -f 2);do echo "wireguard interface $WG_IF exist"; done
@@ -50,8 +52,8 @@ if [ -z ${AllowedIPs} ] ;then
    done
 fi 
 
-if [ -f /etc/wireguard/keys/_priv ];then
-  mv /etc/wireguard/keys/_priv /etc/wireguard/keys/${username}_priv
+if [ -f ${WG_DIR_KEYS}/_priv ];then
+  mv ${WG_DIR_KEYS}/_priv ${WG_DIR_KEYS}/${username}_priv
 fi
 
 uci commit network
