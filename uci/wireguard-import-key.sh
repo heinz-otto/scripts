@@ -59,4 +59,5 @@ fi
 uci commit network
 
 echo "created wireguard peer for Interface ${WG_IF} with Name ${username}"
-echo a final network restart is needed
+echo a final interface restart is needed to activate the peers 
+echo "ubus call network.interface.${WG_IF} down && ubus call network.interface.${WG_IF} up"
