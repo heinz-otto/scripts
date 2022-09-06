@@ -12,7 +12,7 @@ fi
 # Configuration parameters
 # WG_IF="vpn"           # interfacename to add client configs
 # if more than one wireguard interface - the last one will win
-for WG_IF in $(uci show network|grep proto=.wireguard| cut -d '.' -f 2);do echo $WG_IF;done
+for WG_IF in $(uci show network|grep proto=.wireguard| cut -d '.' -f 2);do echo "wireguard interface $WG_IF exist"; done
 
 WG_PUB=$1
 WG_PSK=$2
