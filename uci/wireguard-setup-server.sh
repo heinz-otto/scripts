@@ -1,8 +1,8 @@
-#!/bin/ash
+#!/bin/sh
 # Code is based on https://openwrt.org/docs/guide-user/services/vpn/wireguard/server
 # usage: ./wireguard-setup-server.sh KEY ADDR PORT IFname
 # usage with pipe: echo "KEY ADDR PORT IFname"|xargs ./wireguard-setup-server.sh
-# create new wiregurad server interface ./wireguard-setup-server.sh $(wg genkey) "192.168.10.1" 51830 vpn10
+# create new wireguard server interface ./wireguard-setup-server.sh $(wg genkey) "192.168.10.1" 51830 vpn10
 
 # Configuration parameters, read from input or setting defaults
 # if parameter is empty the string is expanded https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
@@ -15,6 +15,7 @@ WG_ADDR6=${5:-"fdf1:e8a1:8d3f:${WG_SUB}::1/64"}
 # base path for confing & key files if exists
 WG_DIR="/etc/wireguard" 
 WG_DIR_KEYS="${WG_DIR}/keys"
+mkdir -p ${WG_DIR_KEYS}
 
 # Install packages
 if [ -z $(opkg list-installed|grep -o kmod-wireguard) ]; then
@@ -42,16 +43,6 @@ uci rename firewall.@zone[0]="lan"
 uci rename firewall.@zone[1]="wan"
 uci del_list firewall.lan.network="${WG_IF}"
 uci add_list firewall.lan.network="${WG_IF}"
-### old version for wg port rule # this part of script was not usable for more than one wg interface - todo!
-# uci -q delete firewall.wg
-# uci set firewall.wg="rule"
-# uci set firewall.wg.name="Allow-WireGuard-${WG_IF}"
-# uci set firewall.wg.src="wan"
-# uci set firewall.wg.dest_port="${WG_PORT}"
-# uci set firewall.wg.proto="udp"
-# uci set firewall.wg.target="ACCEPT"
-# new version for wg port rule 
-# delete existing rule # awk trennt am Punkt, sucht im Part3 den match und gibt Part 1 und 2 mit Punkt getrennt wieder aus
 for rule in $(uci show firewall|awk -F. 'match($3,/Allow-WireGuard-'$WG_IF'/) { print $1"."$2 }') ; do
    uci -q delete $rule
 done
