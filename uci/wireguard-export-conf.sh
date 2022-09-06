@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/sh
 # Code is inspired from https://openwrt.org/docs/guide-user/services/vpn/wireguard/start
 
 # functions
@@ -24,15 +24,15 @@ function print_config () {
         printf "\n########## config for peer ${username:-noname} ##########\n"
         # begin heredoc read into variable - importend: there must be tabs in front of heredoc lines!
         read -r -d '' WG_CLIENT_CONFIG <<-EOF
-        [Interface]
-        Address = ${WG_ADDR}
-        PrivateKey = $(cat /etc/wireguard/keys/${username}_priv 2> /dev/null || echo private key not found)
-        [Peer]
-        PublicKey = $(uci get network.${WG_IF}.private_key|wg pubkey)
-        AllowedIPs = ${WG_IPS}
-        Endpoint = ${WG_HOST}:${WG_PORT}
-        $( [ -z ${WG_PSK} ] || echo PresharedKey = ${WG_PSK} )
-        EOF
+[Interface]
+Address = ${WG_ADDR}
+PrivateKey = $(cat /etc/wireguard/keys/${username}_priv 2> /dev/null || echo private key not found)
+[Peer]
+PublicKey = $(uci get network.${WG_IF}.private_key|wg pubkey)
+AllowedIPs = ${WG_IPS}
+Endpoint = ${WG_HOST}:${WG_PORT}
+$( [ -z ${WG_PSK} ] || echo PresharedKey = ${WG_PSK} )
+EOF
         # end heredoc
 
         if [ "$qr" = "1" ]; then
