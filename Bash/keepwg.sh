@@ -1,6 +1,6 @@
 #!/bin/bash
 # entry in crontab: sudo crontab -e
-#*/5 * * * * /home/otto/keepwg.sh >> /home/otto/keepwg.log 2>&1
+#*/5 * * * * /home/otto/keepwg.sh 10.6.0.1 >> /home/otto/keepwg.log 2>&1
 if [ -z "$1" ]; then
   echo "usage:"
   echo "${0##*/} <Tunnel IP Server> [wireguard interface name]"
