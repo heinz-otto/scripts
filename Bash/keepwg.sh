@@ -10,7 +10,7 @@ if [ -z "$1" ]; then
 fi
 
 WG_GWIP=$1
-WG_IF=WG_IF=${2:-"wg0"}
+WG_IF=${2:-"wg0"}
 date
 if ! /bin/ping -c 1 $WG_GWIP
 then
