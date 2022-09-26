@@ -25,6 +25,6 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
-for interface in $(wg show interfaces); do 
+for interface in $(wg show interfaces); do
    systemctl enable --now wg-reresolve-dns@${interface}.timer
 done
