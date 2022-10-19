@@ -1,8 +1,11 @@
 ##############################################
-# $Id: 99_valetudoUtils.pm 25558 2022-01-25 11:32:05Z Otto123 $
+# $Id: 99_valetudoUtils.pm 26554 2022-10-18 13:01:21Z Otto123 $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for valetudo v2 API MQTT Implementation
 # They are then available in every Perl expression.
+
+# for zone cleaning after release 2022.05 a Reading .zones as json String is needed 
+# {"Zone1": copy of string in the UI,"Zone2": copy of string in the UI }
 
 package main;
 
@@ -40,20 +43,21 @@ sub valetudo_w {
         my $decoded = decode_j($json);
         return join ',', sort values %{$decoded}
     }
-
-# this part read presets which contains a full json for preset zones or locations
+    # this part read presets which contains a full json for preset zones or locations
+    # depending on the valetudo release, there was a fundamental change in 2022.05
     if ($setter eq 'zones' or $setter eq 'locations') {
-	if (ReadingsVal($NAME,'valetudo_release','') lt '2022.05.0') {
+      if (ReadingsVal($NAME,'valetudo_release','') lt '2022.05.0') {
+        # old code
         my $json = ReadingsVal($NAME,'.'.$setter.'Presets',q{});
         my $decoded = decode_j($json);
         my @array;
         for ( keys %{$decoded} ) { push @array, $decoded->{$_}->{'name'} }
         return join ',', sort @array
-    } else {
+      } else {
         my $json = ReadingsVal($NAME,'.'.$setter,q{});
         my $decoded = decode_j($json);
         return join ',', sort keys %{$decoded};
-		}
+      }
     }
     # this part is for study purpose to read the full json segments with the REST API like
     # setreading alias=DreameL10pro json_segments {(qx(wget -qO - http://192.168.90.21/api/v2/robot/capabilities/MapSegmentationCapability))}
@@ -63,7 +67,6 @@ sub valetudo_w {
         my @array=@{$decoded};
         my %t;
         for (@array) { $t{$_->{'name'}} = $_->{'id'} }
-		# Log3(undef, 1, join ',', sort keys %t);
         return join ',', sort keys %t 
     }
 }
@@ -90,29 +93,31 @@ sub valetudo_c {
         $ret = $devicetopic.'/MapSegmentationCapability/clean/set '.toJSON $Hcmd{$cmd}
     }
 
-    # this part return the zone/location id according to the selected Name from presets (zones/locations) 
+    # this part return the zone/location id according to the selected Name from presets (zones/locations)
+    # depending on the valetudo release, there was a fundamental change in 2022.05
     if ($cmd eq 'clean_zone') {
-	   if (ReadingsVal($NAME,'valetudo_release','') lt '2022.05.0') {
-	   # old code
-        my $json = ReadingsVal($NAME,'.zonesPresets',q{});
-        my $decoded = decode_j($json);
-        for (keys %{$decoded}) { 
+       if (ReadingsVal($NAME,'valetudo_release','') lt '2022.05.0') {
+         # old code
+          my $json = ReadingsVal($NAME,'.zonesPresets',q{});
+          my $decoded = decode_j($json);
+          for (keys %{$decoded}) { 
             if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/ZoneCleaningCapability/start/set '.$_ } 
-        }
-	    } else {
+          }
+       } else {
            my $json = ReadingsVal($NAME,'.zones',q{});
            my $decoded = decode_j($json);
            for (keys %{$decoded}) { 
                if ( $_ eq $load ) {$ret = $devicetopic.'/ZoneCleaningCapability/start/set '.encode_json $decoded->{$_} } 
            }
-		}
+       }
     }
+
     if ($cmd eq 'goto') {
         my $json = ReadingsVal($NAME,'.locationsPresets',q{});
         my $decoded = decode_j($json);
-		for (keys %{$decoded}) { 
-              if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.$_ }
-		}
+        for (keys %{$decoded}) { 
+            if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.$_ } 
+        }
     }
 
     # this part is for study purpose to read the full json segments with the REST API
@@ -137,9 +142,10 @@ sub valetudo_c {
 sub valetudo_f {
     my $NAME = shift;   # Devicename of the robot
     my $substr = shift; # requested Feature like GoToLocation or MapSegmentation
-    my $ip = ReadingsVal($NAME,'ip4',(split ',',ReadingsVal($NAME,'ips','error'))[0]);
+    # my $ip = ReadingsVal($NAME,'ip4',(split ',',ReadingsVal($NAME,'ips','error'))[0]);
+    my $ip = ( split '_', InternalVal($NAME,ReadingsVal($NAME,'IODev','').'_CONN','error') )[1] ;
     my $string = GetHttpFile($ip, '/api/v2/robot/capabilities');
-    index($string, $substr) == -1 ? '0':'1';
+    index($string, $substr) == -1 ? 0:1;
 }
 #######
 # add a line to multiline Attribute setList or regList
