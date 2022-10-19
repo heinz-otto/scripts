@@ -87,7 +87,7 @@ if ($cmd eq 'goto') {
     if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.$_ } 
 	}
   }
-
+}
 ####### 
 # ask the robot via REST API for Featurelist and feature and return true false
 sub valetudo_f {
