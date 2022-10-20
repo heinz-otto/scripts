@@ -107,7 +107,7 @@ sub valetudo_c {
            my $json = ReadingsVal($NAME,'.zones',q{});
            my $decoded = decode_j($json);
            for (keys %{$decoded}) { 
-               if ( $_ eq $load ) {$ret = $devicetopic.'/ZoneCleaningCapability/start/set '.encode_json $decoded->{$_} } 
+               if ( $_ eq $load ) {$ret = $devicetopic.'/ZoneCleaningCapability/start/set '.toJSON $decoded->{$_} } 
            }
        }
     }
@@ -152,7 +152,7 @@ sub valetudo_z {
         my $zone_name = 'Zone'.((keys %{$decoded} )+ 1);
         my ($key, $val) = ($zone_name, decode_j $load);
         $decoded->{$key} = $val;
-        $ret = encode_json ($decoded);
+        $ret = toJSON ($decoded);
       } else {$ret = "{\"Zone1\":$load}"}
     }
     return $ret
