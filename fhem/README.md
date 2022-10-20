@@ -18,11 +18,11 @@ remove template
 { qx(rm ./FHEM/lib/AttrTemplate/ottos.template);; AttrTemplate_Initialize() }
 ```
 
-get a Utils File local to FHEM
+get a utils file local to FHEM
 ```
 { $data{f}='99_valetudoUtils.pm';; qx(wget -qO "./FHEM/$data{f}" "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}");; fhem("sleep 2;;reload $data{f}") }
 ```
-replace them with the svn file
+replace the file with the original svn file
 ```
 { $data{f}='99_valetudoUtils.pm';;{ Svn_GetFile("contrib/AttrTemplate/$data{f}", "FHEM/$data{f}", sub(){CommandReload(undef, $data{f})}) } }
 ```
