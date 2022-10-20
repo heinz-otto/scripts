@@ -20,7 +20,7 @@ remove template
 
 get a Utils File local to FHEM
 ```
-{ $data{f}='99_valetudoUtils.pm';; qx(wget -qO "./FHEM/$data{f}" "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}");; fhem("reload $data{f}") }
+{ $data{f}='99_valetudoUtils.pm';; qx(wget -qO "./FHEM/$data{f}" "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}");; fhem("sleep 2;;reload $data{f}") }
 ```
 replace them with the svn file
 ```
