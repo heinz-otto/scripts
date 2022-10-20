@@ -137,6 +137,27 @@ sub valetudo_c {
     }
     return $ret
 }
+
+#######
+# handling .zones Reading
+sub valetudo_z {
+    my $NAME = shift;
+    my ($cmd,$load) = split q{ }, shift, 2;
+    my $ret = 'error';
+    if ($cmd eq 'zoneNew') {
+      my $zonen_old = ReadingsVal($NAME,'.zones','');
+      $load =~ s/[\n\r\s]//g;
+      if ($zonen_old ne '') {
+        my $decoded = decode_j($zonen_old);
+        my $zone_name = 'Zone'.((keys %{$decoded} )+ 1);
+        my ($key, $val) = ($zone_name, decode_j $load);
+        $decoded->{$key} = $val;
+        $ret = encode_json ($decoded);
+      } else {$ret = "{\"Zone1\":$load}"}
+    }
+    return $ret
+}
+
 ####### 
 # ask the robot via REST API for Featurelist and feature and return true false
 sub valetudo_f {
