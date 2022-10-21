@@ -141,21 +141,28 @@ sub valetudo_c {
 #######
 # handling .zones Reading
 sub valetudo_z {
-    my $NAME = shift;
-    my ($cmd,$load) = split q{ }, shift, 2;
-    my $ret = 'error';
-    if ($cmd eq 'zoneNew') {
-      my $zonen_old = ReadingsVal($NAME,'.zones','');
-      $load =~ s/[\n\r\s]//g;
-      if ($zonen_old ne '') {
-        my $decoded = decode_j($zonen_old);
-        my $zone_name = 'Zone'.((keys %{$decoded} )+ 1);
+   my $NAME = shift;
+   my ($cmd,$load) = split q{ }, shift, 2;
+   my $ret = 'error';
+   my $zonen = ReadingsVal($NAME,'.zones','');
+   if ($cmd eq 'zoneNew') {
+	 $load =~ s/[\n\r\s]//g;
+	 if ($zonen ne '') {
+	    my $decoded = decode_j($zonen);
+	    my $zone_name = 'Zone'.((keys %{$decoded} )+ 1);
         my ($key, $val) = ($zone_name, decode_j $load);
         $decoded->{$key} = $val;
         $ret = toJSON ($decoded);
-      } else {$ret = "{\"Zone1\":$load}"}
-    }
-    return $ret
+	  } else {$ret = "{\"Zone1\":$load}"}
+	}
+	if ($cmd eq 'zoneRename') {
+	   my ($part1,$part2) = split q{ },$load;
+       my @keys = keys %{ decode_j($zonen) };
+	   for (@keys) { if($_ eq $part1){ $zonen =~ s/$part1/$part2/ } }
+	   $ret = $zonen;
+	   fhem("setreading $NAME $cmd ".join ' ',(sort keys %{ decode_j($ret) } ) );
+	}
+	return $ret
 }
 
 ####### 
