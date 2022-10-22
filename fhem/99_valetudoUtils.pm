@@ -160,10 +160,11 @@ sub valetudo_z {
        my @keys = keys %{ decode_j($zonen) };
        for (@keys) { if($_ eq $part1){ $zonen =~ s/$part1/$part2/ } }
        $ret = $zonen;
-       fhem("setreading $NAME $cmd ".join ' ',(sort keys %{ decode_j($ret) } ) );
     }
+    fhem("setreading $NAME zoneRename ".join ' ',(reverse sort keys %{ decode_j($ret) } ) );
     return $ret
 }
+
 
 ####### 
 # ask the robot via REST API for Featurelist and feature and return true false
