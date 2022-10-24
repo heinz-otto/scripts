@@ -84,7 +84,7 @@ sub valetudo_c {
 
     # this part return an array of segment id's according to selected Names from segments (simple json)
     if ($cmd eq 'clean_segment') {
-        my @rooms = split ',', $load;
+        my @rooms = split q{,}, $load;
         my $json = ReadingsVal($NAME,'.segments',q{});
         my $decoded = decode_j($json);
         my @ids;
@@ -211,7 +211,6 @@ sub valetudo_r {
     if ($feature eq 'WifiConfigurationCapability')
        {return $value eq 'ips' ? {"ip4"=>(split q{,},$EVENT)[0]}:{"$value"=>$EVENT} }
 }
-
 
 #######
 # add a line to multiline Attribute setList or regList
