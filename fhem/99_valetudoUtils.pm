@@ -165,7 +165,6 @@ sub valetudo_z {
     return $ret
 }
 
-
 ####### 
 # ask the robot via REST API for Featurelist and feature and return true false
 sub valetudo_f {
@@ -176,6 +175,44 @@ sub valetudo_f {
     my $string = GetHttpFile($ip, '/api/v2/robot/capabilities');
     index($string, $substr) == -1 ? 0:1;
 }
+
+#######
+# used for readingList. return readingname -> value pairs
+# look https://valetudo.cloud/pages/integrations/mqtt.htm for details mqtt implementation
+sub valetudo_r {
+    my $NAME = shift;
+    my $feature = shift;
+    my $value = shift;
+    my $EVENT = shift;
+    #Log3(undef, 1, "Name $NAME, featur $feature, value $value, $EVENT");
+     
+    if ($feature =~ m,(^Att.*|^Basic.*|^Consum.*|^Loc.*),)
+       {return {"$value"=>$EVENT} }
+    if ($feature eq 'BatteryStateAttribute')
+       {return $value eq 'level' ? {"batteryPercent"=>$EVENT}:
+               $value eq 'status' ? {"batteryState"=>$EVENT}:{"$value"=>$EVENT} }
+    if ($feature eq 'CurrentStatisticsCapability')
+       {return $value eq 'area' ? {"area"=>sprintf("%.2f",($EVENT / 10000))." m²"}:{"$value"=>$EVENT} }
+    if ($feature eq 'FanSpeedControlCapability')
+       {return $value eq 'preset' ? {"fanSpeed"=>$EVENT}:{"$value"=>$EVENT} }
+    if ($feature eq 'GoToLocationCapability' or $feature eq 'ZoneCleaningCapability' or $feature eq 'MapSegmentationCapability')
+       {return {} }
+    if ($feature eq 'MapData')
+       {return $value eq 'map-data' ? {}:
+               $value eq 'segments' ? {".segments"=>$EVENT}:{"$value"=>$EVENT} }
+    if ($feature eq 'OperationModeControlCapability')
+       {return $value eq 'preset' ? {"operationMode"=>$EVENT}:{"$value"=>$EVENT} }
+    if ($feature eq 'StatusStateAttribute')
+       {return $value eq 'status' ? {"state"=>$EVENT,"cleanerState"=>$EVENT}:
+               $value eq 'detail' ? {"stateDetail"=>$EVENT}:
+               $value eq 'error' ? {"stateError"=>$EVENT}:{"$value"=>$EVENT} }
+    if ($feature eq 'WaterUsageControlCapability')
+       {return $value eq 'preset' ? {"waterUsage"=>$EVENT}:{"$value"=>$EVENT} }
+    if ($feature eq 'WifiConfigurationCapability')
+       {return $value eq 'ips' ? {"ip4"=>(split q{,},$EVENT)[0]}:{"$value"=>$EVENT} }
+}
+
+
 #######
 # add a line to multiline Attribute setList or regList
 # CommandAttr_multiline( 'MQTT2_valetudo_xxx','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
