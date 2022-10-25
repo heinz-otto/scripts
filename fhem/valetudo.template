@@ -29,6 +29,8 @@ attr DEVICE setList \
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
   x_raw_payload:textField { valetudo_c($NAME,$EVENT) }\
   delete:zones,locations {fhem("deletereading $NAME .$EVTPART1");;return undef}\
+  zoneNew:textField { valetudo_z($NAME,$EVENT) }\
+  zoneRename:textField { valetudo_z($NAME,$EVENT) }\
   get:segments,release,ip { valetudo_g($NAME,$EVENT) }
 attr DEVICE event-on-change-reading .*
 attr DEVICE timestamp-on-change-reading .*
@@ -40,8 +42,6 @@ attr DEVICE stateFormat cleanerState\
 setreading DEVICE attrTemplateVersion 20221025
 option:{valetudo_f('DEVICE','MapSegmentation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }) ) }
-{ CommandAttr_multiline( 'DEVICE','setList',q(  zoneNew:textField { valetudo_z($NAME,$EVENT) }) ) }
-{ CommandAttr_multiline( 'DEVICE','setList',q(  zoneRename:textField { valetudo_z($NAME,$EVENT) }) ) }
 option:{valetudo_f('DEVICE','GoToLocation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) ) }
 { CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) ) }
