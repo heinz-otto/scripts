@@ -57,6 +57,7 @@ sub valetudo_w {
         my $json = ReadingsVal($NAME,'.'.$setter,q{});
         my $decoded = decode_j($json);
         return join ',', sort keys %{$decoded};
+        #attr MQTT2_ClumsyQuirkyCattle userReadings zoneRename:.zones.* { join ' ',sort keys %{ decode_j(ReadingsVal($name,'.zones','')) } }
       }
     }
     # this part is for study purpose to read the full json segments with the REST API like
@@ -84,7 +85,7 @@ sub valetudo_c {
 
     # this part return an array of segment id's according to selected Names from segments (simple json)
     if ($cmd eq 'clean_segment') {
-        my @rooms = split q{,}, $load;
+        my @rooms = split ',', $load;
         my $json = ReadingsVal($NAME,'.segments',q{});
         my $decoded = decode_j($json);
         my @ids;
@@ -137,32 +138,34 @@ sub valetudo_c {
     }
     return $ret
 }
-
 #######
 # handling .zones Reading
 sub valetudo_z {
    my $NAME = shift;
    my ($cmd,$load) = split q{ }, shift, 2;
    my $ret = 'error';
-   my $zonen = ReadingsVal($NAME,'.zones','');
-   if ($cmd eq 'zoneNew') {
+   my $reading = $cmd =~ m,^zone, ? 'zone':'location';
+   my $json = ReadingsVal($NAME,'.'.$reading.'s','');
+   if ($cmd =~ m,New$,) {
      $load =~ s/[\n\r\s]//g;
-     if ($zonen ne '') {
-        my $decoded = decode_j($zonen);
-        my $zone_name = 'Zone'.((keys %{$decoded} )+ 1);
+     if ($json ne '') {
+        my $decoded = decode_j($json);
+        my $zone_name = 'Zjson'.((keys %{$decoded} )+ 1);
         my ($key, $val) = ($zone_name, decode_j $load);
         $decoded->{$key} = $val;
         $ret = toJSON ($decoded);
-      } else {$ret = "{\"Zone1\":$load}"}
+      } else {$ret = "{\"Zjson1\":$load}"}
     }
-    if ($cmd eq 'zoneRename') {
+    if ($cmd =~ m,Rename$,) {
        my ($part1,$part2) = split q{ },$load;
-       my @keys = keys %{ decode_j($zonen) };
-       for (@keys) { if($_ eq $part1){ $zonen =~ s/$part1/$part2/ } }
-       $ret = $zonen;
+       my @keys = keys %{ decode_j($json) };
+       for (@keys) { if($_ eq $part1){ $json =~ s/$part1/$part2/ } }
+       $ret = $json;
+       #fhem("setreading $NAME $cmd ".join ' ',(sort keys %{ decode_j($ret) } ) );
     }
-    fhem("setreading $NAME zoneRename ".join ' ',(reverse sort keys %{ decode_j($ret) } ) );
-    return $ret
+    fhem("setreading $NAME ".$reading."Rename ".join ' ',(reverse sort keys %{ decode_j($ret) } ) );
+    fhem("setreading $NAME .".$reading."s ".$ret);
+    return undef
 }
 
 ####### 
@@ -210,6 +213,36 @@ sub valetudo_r {
        {return $value eq 'preset' ? {"waterUsage"=>$EVENT}:{"$value"=>$EVENT} }
     if ($feature eq 'WifiConfigurationCapability')
        {return $value eq 'ips' ? {"ip4"=>(split q{,},$EVENT)[0]}:{"$value"=>$EVENT} }
+}
+
+#######
+# get some Information with Rest Api
+sub valetudo_g {
+    my $NAME = shift;
+    my ($cmd,$load) = split q{ }, shift, 2;
+    #Log3(undef, 1, "Name $NAME, cmd $cmd, load $load");
+    my $ip = (split q{ },$load)[1] || ReadingsVal($NAME,'ip4',(split q{_}, InternalVal($NAME,ReadingsVal($NAME,'IODev','').'_CONN','') )[1] || return 'error no ip');
+    if ($load eq 'segments'){
+       my $url = '/api/v2/robot/capabilities/MapSegmentationCapability';
+       my $json = GetHttpFile($ip, $url);
+       my $decoded = decode_j($json);
+       my @array=@{$decoded};
+       my %t;
+       for (@array) { $t{$_->{'id'}} = $_->{'name'} }; 
+       my $ret = toJSON \%t; 
+       fhem("setreading $NAME .segments $ret");
+       return undef;
+    }
+    if ($load eq 'release'){
+       my $url = '/api/v2/valetudo/version';
+       my $json = GetHttpFile($ip, $url);
+       my $ret = decode_j($json)->{release};
+       #Log3(undef, 1, "setreading $NAME valetudo_release $ret" );
+       fhem("setreading $NAME valetudo_release $ret");
+       return undef;
+    }
+    if ($load =~ m,^ip.*,){ fhem("setreading $NAME ip4 $ip") }
+    return undef;
 }
 
 #######
