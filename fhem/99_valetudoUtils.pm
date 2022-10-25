@@ -1,5 +1,5 @@
 ##############################################
-# $Id: 99_valetudoUtils.pm 26554 2022-10-18 13:01:21Z Otto123 $
+# $Id:  Otto123 $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for valetudo v2 API MQTT Implementation
 # They are then available in every Perl expression.
@@ -181,7 +181,7 @@ sub valetudo_f {
 
 #######
 # used for readingList. return readingname -> value pairs
-# look https://valetudo.cloud/pages/integrations/mqtt.htm for details mqtt implementation
+# look https://valetudo.cloud/pages/integrations/mqtt.html for details mqtt implementation
 sub valetudo_r {
     my $NAME = shift;
     my $feature = shift;
@@ -212,7 +212,16 @@ sub valetudo_r {
     if ($feature eq 'WaterUsageControlCapability')
        {return $value eq 'preset' ? {"waterUsage"=>$EVENT}:{"$value"=>$EVENT} }
     if ($feature eq 'WifiConfigurationCapability')
-       {return $value eq 'ips' ? {"ip4"=>(split q{,},$EVENT)[0]}:{"$value"=>$EVENT} }
+       { 
+       # two possibilities to return more than one reading
+       # may be more than two for (split q{,}, $EVENT){}
+       my $ret = {"ip4"=>(split q{,},$EVENT)[0],"ip6"=>(split q{,},$EVENT)[1]};
+       return $value eq 'ips' ? $ret :{"$value"=>$EVENT} }
+       #my %h;
+       #$h{"ip4"}=(split q{,},$EVENT)[0];
+       #$h{"ip6"}=(split q{,},$EVENT)[1];
+       #return $value eq 'ips' ? \%h :{"$value"=>$EVENT} }
+       #{return $value eq 'ips' ? {"ip4"=>(split q{,},$EVENT)[0]}:{"$value"=>$EVENT} }
 }
 
 #######
