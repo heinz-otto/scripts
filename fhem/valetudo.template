@@ -42,6 +42,7 @@ attr DEVICE stateFormat cleanerState\
 setreading DEVICE attrTemplateVersion 20221025
 option:{valetudo_f('DEVICE','MapSegmentation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }) ) }
+set DEVICE get segments
 option:{valetudo_f('DEVICE','GoToLocation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) ) }
 { CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) ) }
@@ -49,7 +50,6 @@ option:{valetudo_f('DEVICE','GoToLocation')}
 option:{1}
 set DEVICE get ip IP4
 set DEVICE get release
-set DEVICE get segments
 #option:{1}
 #deletereading -q DEVICE (?!associatedWith|IODev).*
 #option:{1}
