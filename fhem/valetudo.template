@@ -5,6 +5,7 @@ desc:use this to control a rooted vacuum with valetudo V2. For further details v
 order:X_03b
 par:BASE_TOPIC;BASE_TOPIC typically is valetudo;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,([^\/:]+)[\/].*, ? $1 : undef }
 par:DEV_ID;DEV_ID is random by Firmware;{ AttrVal("DEVICE","devicetopic",AttrVal("DEVICE","readingList","")) =~ m,[^\/]+\/([^\/:]+).*, ? $1 : undef }
+par:IP4;Device IP Adress;{ReadingsVal("DEVICE",'ip4',(split q{_}, InternalVal("DEVICE",ReadingsVal("DEVICE",'IODev',undef).'_CONN','') )[1]}
 { $data{f}='99_valetudoUtils.pm';\
 # Svn_GetFile() works asynch #{ Svn_GetFile("contrib/AttrTemplate/$data{f}", $data{f}, sub(){CommandReload(undef, $data{f})}) }\
 #{$data{u}="https://svn.fhem.de/trac/browser/trunk/fhem/contrib/AttrTemplate/$data{f}?format=txt"}\
@@ -16,20 +17,7 @@ attr DEVICE devicetopic BASE_TOPIC/DEV_ID
 attr DEVICE icon vacuum_top
 attr DEVICE readingList \
   $\DEVICETOPIC/\x24state:.* _state\
-  $\DEVICETOPIC/(Att.*|Basic.*|Consum.*|Curr.*|Loc.*|Wifi.*)/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/.*\/([a-zA-Z\-_]+),; $1 eq 'ips'? {"ip4"=> (split ',',$EVENT)[0]}:{"$1"=>$EVENT} }\
-  $\DEVICETOPIC/BatteryStateAttribute/level:.* batteryPercent\
-  $\DEVICETOPIC/BatteryStateAttribute/status:.* batteryState\
-  $\DEVICETOPIC/FanSpeedControlCapability/preset:.* fanSpeed\
-  $\DEVICETOPIC/GoToLocationCapability/presets:.* .locationsPresets\
-  $\DEVICETOPIC/GoToLocationCapability/go:.* {}\
-  $\DEVICETOPIC/MapData/map-data:.* {}\
-  $\DEVICETOPIC/MapData/segments:.* .segments\
-  $\DEVICETOPIC/StatusStateAttribute/status:.* { {"state"=>$EVENT,"cleanerState"=>$EVENT} }\
-  $\DEVICETOPIC/StatusStateAttribute/detail:.* stateDetail\
-  $\DEVICETOPIC/StatusStateAttribute/error:.* stateError\
-  $\DEVICETOPIC/WaterUsageControlCapability/preset:.* waterUsage\
-  $\DEVICETOPIC/ZoneCleaningCapability/presets:.* .zonesPresets\
-  $\DEVICETOPIC/ZoneCleaningCapability/start:.* {}
+  $\DEVICETOPIC/.*/[a-zA-Z\-_]+:.* { $TOPIC =~ m,$\DEVICETOPIC\/(.*)\/([a-zA-Z\-_]+),; valetudo_r($NAME,$1,$2,$EVENT) }
 attr DEVICE setList \
   pause:noArg $\DEVICETOPIC/BasicControlCapability/operation/set PAUSE\
   start:noArg $\DEVICETOPIC/BasicControlCapability/operation/set START\
@@ -39,7 +27,9 @@ attr DEVICE setList \
   fanSpeed:off,min,low,medium,high,turbo,max $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
   waterUsage:off,min,low,medium,high,turbo,max $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
-  x_raw_payload:textField { valetudo_c($NAME,$EVENT) }
+  x_raw_payload:textField { valetudo_c($NAME,$EVENT) }\
+  delete:zones,locations {fhem("deletereading $NAME .$EVTPART1");;return undef}\
+  get:segments,release,ip { valetudo_g($NAME,$EVENT) }
 attr DEVICE event-on-change-reading .*
 attr DEVICE timestamp-on-change-reading .*
 attr DEVICE setStateList operation clean_segment clean_zone goto fanSpeed waterUsage locate x_raw_payload
@@ -47,12 +37,20 @@ attr DEVICE model valetudoV2
 attr DEVICE devStateIcon docked:rc_PLAY:start (moving|cleaning):rc_PLAY@blue:pause (idle|paused):rc_PAUSE@red:start returning:refresh:pause 
 attr DEVICE stateFormat cleanerState\
 <a href="http://ip4" target="_blank">cleanerState</a>
-setreading DEVICE attrTemplateVersion 20220121
+setreading DEVICE attrTemplateVersion 20221025
 option:{valetudo_f('DEVICE','MapSegmentation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }) ) }
+{ CommandAttr_multiline( 'DEVICE','setList',q(  zoneNew:textField { valetudo_z($NAME,$EVENT) }) ) }
+{ CommandAttr_multiline( 'DEVICE','setList',q(  zoneRename:textField { valetudo_z($NAME,$EVENT) }) ) }
 option:{valetudo_f('DEVICE','GoToLocation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) ) }
+{ CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) ) }
+{ CommandAttr_multiline( 'DEVICE','setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) ) }
 option:{1}
-deletereading -q DEVICE (?!associatedWith|IODev).*
+set DEVICE get ip IP4
+set DEVICE get release
+set DEVICE get segments
+#option:{1}
+#deletereading -q DEVICE (?!associatedWith|IODev).*
 #option:{1}
 #{Log 3,"Support MapSegmentation ".valetudo_f('DEVICE','MapSegmentation')}
