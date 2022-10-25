@@ -48,13 +48,15 @@ sub valetudo_w {
     if ($setter eq 'zones' or $setter eq 'locations') {
       if (ReadingsVal($NAME,'valetudo_release','') lt '2022.05.0') {
         # old code
-        my $json = ReadingsVal($NAME,'.'.$setter.'Presets',q{});
+        my $json = ReadingsVal($NAME,'.'.$setter.'Presets','{}');
+        if ($json eq '{}') {$json = '{"1":"no_Segment_or_not_supported"}'};
         my $decoded = decode_j($json);
         my @array;
         for ( keys %{$decoded} ) { push @array, $decoded->{$_}->{'name'} }
         return join ',', sort @array
       } else {
-        my $json = ReadingsVal($NAME,'.'.$setter,q{});
+        my $json = ReadingsVal($NAME,'.'.$setter,'{}');
+        if ($json eq '{}') {$json = '{"1":"no_Segment_or_not_supported"}'};
         my $decoded = decode_j($json);
         return join ',', sort keys %{$decoded};
         #attr MQTT2_ClumsyQuirkyCattle userReadings zoneRename:.zones.* { join ' ',sort keys %{ decode_j(ReadingsVal($name,'.zones','')) } }
@@ -86,7 +88,8 @@ sub valetudo_c {
     # this part return an array of segment id's according to selected Names from segments (simple json)
     if ($cmd eq 'clean_segment') {
         my @rooms = split ',', $load;
-        my $json = ReadingsVal($NAME,'.segments',q{});
+        my $json = ReadingsVal($NAME,'.segments','{}');
+        if ($json eq '{}') {$json = '{"1":"no_Segment_or_not_supported"}'};
         my $decoded = decode_j($json);
         my @ids;
         for ( @rooms ) { push @ids, {reverse %{$decoded} }->{$_} }
