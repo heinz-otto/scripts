@@ -48,7 +48,7 @@ option:{valetudo_f('DEVICE','GoToLocation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) ) }
 { CommandAttr_multiline( 'DEVICE','setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) ) }
 option:{1}
-deletereading DEVICE .segments
+deletereading -q DEVICE \.{0,1}segments|map-data
 set DEVICE get ip IP4
 set DEVICE get release
 #option:{1}
