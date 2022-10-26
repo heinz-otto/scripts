@@ -24,8 +24,7 @@ attr DEVICE setList \
   stop:noArg $\DEVICETOPIC/BasicControlCapability/operation/set STOP\
   charge:noArg $\DEVICETOPIC/BasicControlCapability/operation/set HOME\
   clean_zone:{valetudo_w($name,'zones')} { valetudo_c($NAME,$EVENT) }\
-  fanSpeed:off,min,low,medium,high,turbo,max $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
-  waterUsage:off,min,low,medium,high,turbo,max $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1\
+  fanSpeed:min,low,medium,high,max $\DEVICETOPIC/FanSpeedControlCapability/preset/set $EVTPART1\
   locate:PERFORM   $\DEVICETOPIC/LocateCapability/locate/set $EVTPART1\
   x_raw_payload:textField { valetudo_c($NAME,$EVENT) }\
   delete:zones,locations {fhem("deletereading $NAME .$EVTPART1");;return undef}\
@@ -39,7 +38,7 @@ attr DEVICE model valetudoV2
 attr DEVICE devStateIcon docked:rc_PLAY:start (moving|cleaning):rc_PLAY@blue:pause (idle|paused):rc_PAUSE@red:start returning:refresh:pause 
 attr DEVICE stateFormat cleanerState\
 <a href="http://ip4" target="_blank">cleanerState</a>
-setreading DEVICE attrTemplateVersion 20221025
+setreading DEVICE attrTemplateVersion 20221026
 option:{valetudo_f('DEVICE','MapSegmentation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }) ) }
 set DEVICE get segments
@@ -47,6 +46,8 @@ option:{valetudo_f('DEVICE','GoToLocation')}
 { CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) ) }
 { CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) ) }
 { CommandAttr_multiline( 'DEVICE','setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) ) }
+option:{valetudo_f('DEVICE','WaterUsageControl')}
+{ CommandAttr_multiline( 'DEVICE','setList',q(  waterUsage:low,medium,high $\DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1) ) }
 option:{1}
 deletereading -q DEVICE \.{0,1}segments|map-data
 set DEVICE get ip IP4
