@@ -40,7 +40,7 @@ attr DEVICE stateFormat cleanerState\
 <a href="http://ip4" target="_blank">cleanerState</a>
 setreading DEVICE attrTemplateVersion 20221101
 option:{1}
+deletereading -q DEVICE \.{0,1}segments|map-data.*|.*_.*_.*|_.*
 {valetudo_s('DEVICE')}
-deletereading -q DEVICE \.{0,1}segments|map-data
 set DEVICE get ip IP4
 set DEVICE get release
