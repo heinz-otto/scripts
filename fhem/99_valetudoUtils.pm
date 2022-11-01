@@ -300,6 +300,13 @@ Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
   subroutines<br>
   <b>valetudo_w</b> return a string for dynamic selection setList<br>
   <b>valetudo_c</b> return a complete string for setList right part of setList<br>
+  <b>valetudo_z</b> handling .zones Reading<br>
+  <b>valetudo_f</b> ask the robot via REST API for Featurelist and feature and return true false<br>
+  <b>valetudo_r</b> used for readingList. return readingname -> value pairs<br>
+  <b>valetudo_g</b> get some Information with Rest Api<br>
+  <b>valetudo_s</b> doing model spezific setup<br>
+  <b>CommandAttr_multiline</b> add a line to multiline Attribute setList or regList<br>
+  CommandAttr_multiline( 'MQTT2_valetudo_xxx','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )<br>
   <br>
   <a id="MQTT2_DEVICE-setList"></a>
   <b>attr setList</b>
@@ -321,6 +328,13 @@ Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
   subroutines<br>
   <b>valetudo_w</b> return a string for dynamic selection setList<br>
   <b>valetudo_c</b> return a complete string for setList right part of setList<br>
+  <b>valetudo_z</b> handling .zones Reading<br>
+  <b>valetudo_f</b> ask the robot via REST API for Featurelist and feature and return true false<br>
+  <b>valetudo_r</b> used for readingList. return readingname -> value pairs<br>
+  <b>valetudo_g</b> get some Information with Rest Api<br>
+  <b>valetudo_s</b> doing model spezific setup<br>
+  <b>CommandAttr_multiline</b> add a line to multiline Attribute setList or regList<br>
+  CommandAttr_multiline( 'MQTT2_valetudo_xxx','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )<br>
   <br>
   <a id="MQTT2_DEVICE-setList"></a>
   <b>attr setList</b>
@@ -331,7 +345,6 @@ Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
   </ul>
   <br>
 </ul>
-
 
 =end html_DE
 =cut
