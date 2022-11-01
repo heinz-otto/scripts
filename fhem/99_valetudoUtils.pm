@@ -271,7 +271,7 @@ sub valetudo_s {
         CommandAttr_multiline($NAME,'setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) );
     }
     if (valetudo_f($NAME,'WaterUsageControl') ) {
-        CommandAttr_multiline( 'DEVICE','setList',q(  waterUsage:low,medium,high $DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1) );
+        CommandAttr_multiline($NAME,'setList',q(  waterUsage:low,medium,high $DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1) );
     }
 }
 
