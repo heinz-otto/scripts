@@ -258,6 +258,24 @@ sub valetudo_g {
 }
 
 #######
+# setup according supported features
+sub valetudo_s {
+    my $NAME = shift;
+    if (valetudo_f($NAME,'MapSegmentation') ) {
+        CommandAttr_multiline($NAME,'setList',q(  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }) );
+        fhem('set $NAME get segments');
+    }
+    if (valetudo_f($NAME,'GoToLocation') ) {
+        CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) );
+        CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) );
+        CommandAttr_multiline( 'DEVICE','setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) );
+    }
+    if (valetudo_f($NAME,'WaterUsageControl') ) {
+        CommandAttr_multiline( 'DEVICE','setList',q(  waterUsage:low,medium,high $DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1) );
+    }
+}
+
+#######
 # add a line to multiline Attribute setList or regList
 # CommandAttr_multiline( 'MQTT2_valetudo_xxx','setList',q(  clean_segment:{"multiple-strict,".valetudo_w($name,"segments")} { valetudo_c($NAME,$EVENT) }) )
 sub CommandAttr_multiline {
