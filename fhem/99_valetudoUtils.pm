@@ -266,9 +266,9 @@ sub valetudo_s {
         fhem('set $NAME get segments');
     }
     if (valetudo_f($NAME,'GoToLocation') ) {
-        CommandAttr_multiline( 'DEVICE','setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) );
-        CommandAttr_multiline( 'DEVICE','setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) );
-        CommandAttr_multiline( 'DEVICE','setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) );
+        CommandAttr_multiline($NAME,'setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) );
+        CommandAttr_multiline($NAME,'setList',q(  locationNew:textField { valetudo_z($NAME,$EVENT) }) );
+        CommandAttr_multiline($NAME,'setList',q(  locationRename:textField { valetudo_z($NAME,$EVENT) }) );
     }
     if (valetudo_f($NAME,'WaterUsageControl') ) {
         CommandAttr_multiline( 'DEVICE','setList',q(  waterUsage:low,medium,high $DEVICETOPIC/WaterUsageControlCapability/preset/set $EVTPART1) );
