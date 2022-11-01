@@ -1,5 +1,5 @@
 ##############################################
-# $Id:  Otto123 $
+# $Id: 99_valetudoUtils.pm 26640 2022-11-01 15:45:27Z Otto123 $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for valetudo v2 API MQTT Implementation
 # They are then available in every Perl expression.
@@ -117,12 +117,20 @@ sub valetudo_c {
     }
 
     if ($cmd eq 'goto') {
+       if (ReadingsVal($NAME,'valetudo_release','') lt '2022.05.0') {
         my $json = ReadingsVal($NAME,'.locationsPresets',q{});
         my $decoded = decode_j($json);
         for (keys %{$decoded}) { 
-            if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.$_ } 
+            if ( $decoded->{$_}->{'name'} eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.$_ }
         }
-    }
+    } else {
+        my $json = ReadingsVal($NAME,'.locations',q{});
+        my $decoded = decode_j($json);
+           for (keys %{$decoded}) { 
+               if ( $_ eq $load ) {$ret = $devicetopic.'/GoToLocationCapability/go/set '.toJSON $decoded->{$_} } 
+           }
+	   }
+	}
 
     # this part is for study purpose to read the full json segments with the REST API
     # this part return an array of segment id's according to selected Names from json_segments (complex json)
@@ -176,8 +184,8 @@ sub valetudo_z {
 sub valetudo_f {
     my $NAME = shift;   # Devicename of the robot
     my $substr = shift; # requested Feature like GoToLocation or MapSegmentation
-    # my $ip = ReadingsVal($NAME,'ip4',(split ',',ReadingsVal($NAME,'ips','error'))[0]);
-    my $ip = ( split '_', InternalVal($NAME,ReadingsVal($NAME,'IODev','').'_CONN','error') )[1] ;
+    my $ip = ReadingsVal($NAME,'ip4',(split ',',ReadingsVal($NAME,'ips','error'))[0]);
+    #my $ip = ( split '_', InternalVal($NAME,ReadingsVal($NAME,'IODev','').'_CONN','error') )[-2] ;
     my $string = GetHttpFile($ip, '/api/v2/robot/capabilities');
     index($string, $substr) == -1 ? 0:1;
 }
@@ -233,7 +241,7 @@ sub valetudo_g {
     my $NAME = shift;
     my ($cmd,$load) = split q{ }, shift, 2;
     #Log3(undef, 1, "Name $NAME, cmd $cmd, load $load");
-    my $ip = (split q{ },$load)[1] || ReadingsVal($NAME,'ip4',(split q{_}, InternalVal($NAME,ReadingsVal($NAME,'IODev','').'_CONN','') )[1] || return 'error no ip');
+    my $ip = (split q{ },$load)[1] || ReadingsVal($NAME,'ip4',(split q{_}, InternalVal($NAME,ReadingsVal($NAME,'IODev','').'_CONN','') )[-2] || return 'error no ip');
     if ($load eq 'segments'){
        my $url = '/api/v2/robot/capabilities/MapSegmentationCapability';
        my $json = GetHttpFile($ip, $url);
@@ -292,7 +300,6 @@ sub CommandAttr_multiline {
 =item summary    generic MQTT2 vacuum valetudo Device
 =item summary_DE generische MQTT2 Staubsauger gerootet mit valetudo
 =begin html
-
 Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
 <a id="MQTT2 valetudo"></a>
 <h3>MQTT2 valetudoUtils</h3>
@@ -317,10 +324,8 @@ Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
   </ul>
   <br>
 </ul>
-
 =end html
 =begin html_DE
-
 Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
 <a id="MQTT2 valetudo"></a>
 <h3>MQTT2 valetudoUtils</h3>
@@ -345,6 +350,5 @@ Subroutines for generic MQTT2 vacuum cleaner Devices rooted with valetudo.
   </ul>
   <br>
 </ul>
-
 =end html_DE
 =cut
