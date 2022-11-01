@@ -263,7 +263,7 @@ sub valetudo_s {
     my $NAME = shift;
     if (valetudo_f($NAME,'MapSegmentation') ) {
         CommandAttr_multiline($NAME,'setList',q(  clean_segment:{'multiple-strict,'.valetudo_w($name,'segments')} { valetudo_c($NAME,$EVENT) }) );
-        fhem('set $NAME get segments');
+        fhem("set $NAME get segments");
     }
     if (valetudo_f($NAME,'GoToLocation') ) {
         CommandAttr_multiline($NAME,'setList',q(  goto:{valetudo_w($name,'locations')} { valetudo_c($NAME,$EVENT) }) );
