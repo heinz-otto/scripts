@@ -1,5 +1,5 @@
 ##############################################
-# $Id: 99_valetudoUtils.pm 26640 2022-11-01 15:45:27Z Otto123 $
+# $Id: 99_valetudoUtils.pm 26679 2022-11-09 17:45:17Z Otto123 $
 # from myUtilsTemplate.pm 21509 2020-03-25 11:20:51Z rudolfkoenig
 # utils for valetudo v2 API MQTT Implementation
 # They are then available in every Perl expression.
@@ -216,14 +216,14 @@ sub valetudo_r {
     if ($feature =~ m,(^Att.*|^Basic.*|^Loc.*),)
        {return {"$value"=>$EVENT} }
     if ($feature =~ m,(^Consum.*),)
-       {return ($TMF ne '') ? {"$value"=>sprintf "%dd %02dh %02dm",valetudo_dhms($EVENT)}:
+       {return ($TMF ne '') ? {"$value"=>sprintf '%dd %02dh %02dm',valetudo_dhms($EVENT)}:
                {"$value"=>$EVENT} }
     if ($feature eq 'BatteryStateAttribute')
        {return $value eq 'level' ? {"batteryPercent"=>$EVENT}:
                $value eq 'status' ? {"batteryState"=>$EVENT}:{"$value"=>$EVENT} }
     if ($feature eq 'CurrentStatisticsCapability')
        {return $value eq 'area' ? {"$value"=>sprintf("%.2f",($EVENT / 10000))." m²"}:
-               ($value eq 'time' and $TMF ne '') ? {"$value"=>sprintf "%02d:%02d:%02d",valetudo_dhms($EVENT)}:
+               ($value eq 'time' and $TMF ne '') ? {"$value"=>sprintf '%2$02dh %3$02dm %4$02ds',valetudo_dhms($EVENT)}:
                {"$value"=>$EVENT} }
     if ($feature eq 'FanSpeedControlCapability')
        {return $value eq 'preset' ? {"fanSpeed"=>$EVENT}:{"$value"=>$EVENT} }
