@@ -20,9 +20,9 @@ remove template
 
 get a utils file local to FHEM
 ```
-{ $data{f}='99_valetudoUtils.pm';; qx(wget -qO "./FHEM/$data{f}" "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$data{f}");; fhem("sleep 2;;reload $data{f}") }
+{ my $f ='99_valetudoUtils.pm';; qx(wget -qO "./FHEM/$f" "https://raw.githubusercontent.com/heinz-otto/scripts/master/fhem/$f");; fhem("sleep 2;;reload $f") }
 ```
 replace the file with the original svn file
 ```
-{ $data{f}='99_valetudoUtils.pm';;{ Svn_GetFile("contrib/AttrTemplate/$data{f}", "FHEM/$data{f}", sub(){CommandReload(undef, $data{f})}) } }
+{ my $f ='99_valetudoUtils.pm';;{ Svn_GetFile("contrib/AttrTemplate/$f", "FHEM/$f", sub(){CommandReload(undef, $f)}) } }
 ```
