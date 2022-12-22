@@ -1,4 +1,6 @@
 #!/bin/bash
+# wget -4 https://raw.githubusercontent.com/heinz-otto/scripts/master/Bash/keepwg.sh
+# chmod +x keepwg.sh
 # entry in crontab: sudo crontab -e
 #*/5 * * * * /home/otto/keepwg.sh 10.6.0.1 >> /home/otto/keepwg.log 2>&1
 if [ -z "$1" ]; then
