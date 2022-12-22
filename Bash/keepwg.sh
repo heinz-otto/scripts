@@ -18,5 +18,5 @@ if ! /bin/ping -c 1 $WG_GWIP
 then
   /usr/bin/systemctl restart wg-quick@${WG_IF}
   echo "restart interface $WG_IF"
-  else echo "$WG_GWIP is reachable"
+  else echo "Interface $WG_IF with IP $WG_GWIP is reachable"
 fi
