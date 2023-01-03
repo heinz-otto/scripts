@@ -4,7 +4,6 @@
 # to run every 30 seconds. Requires that wireguard-tools is installed.
 # This script will enable the timer service for every wg interface
 
-
 export NAME=wg-reresolve-dns@
 cat >/etc/systemd/system/${NAME}.service <<EOF
 [Unit]
@@ -25,6 +24,20 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
+r='^DNS = 192'
+
 for interface in $(wg show interfaces); do
-   systemctl enable --now wg-reresolve-dns@${interface}.timer
+   f="/etc/wireguard/${interface}.conf"
+   n="/etc/wireguard/${interface}.new"
+   if grep "$r" "$f" ; then
+      while true; do
+        read -p "Die conf hat einen DNS Eintrag - entfernen? " yn
+        case $yn in
+             [Yy]* ) sed /"$r"/d "$f" > $n; wg syncconf ${interface} $n; mv $f ${interface}.sav ; mv $n $f ; break;;
+             [Nn]* ) break;;
+             * ) echo "Please answer yes or no.";;
+        esac
+      done
+      systemctl enable --now wg-reresolve-dns@${interface}.timer
+   fi
 done
