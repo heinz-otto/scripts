@@ -33,7 +33,7 @@ for interface in $(wg show interfaces); do
       while true; do
         read -p "Die conf hat einen DNS Eintrag - entfernen? " yn
         case $yn in
-             [Yy]* ) sed /"$r"/d "$f" > $n; wg syncconf ${interface} $n; mv $f ${interface}.sav ; mv $n $f ; break;;
+             [Yy]* ) sed /"$r"/d "$f" > $n; mv $f ${interface}.sav ; mv $n $f ; break;; # hier muss noch ein reload hin? wg syncconf wg0 <(wg-quick strip wg0)
              [Nn]* ) break;;
              * ) echo "Please answer yes or no.";;
         esac
