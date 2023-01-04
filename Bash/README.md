@@ -3,7 +3,9 @@ This script install automatically two service units for using the reresolve-dns.
 
 Sometimes an Client behind IPv6 DSL forces IPv6 addresses for resolving the names and github seems not to being reachable with IPv6. Force using IPv4 with the option -4 
 ```
-# wget -4 -qO- https://raw.githubusercontent.com/heinz-otto/scripts/master/Bash/install-wireguard-reresolve-dns.sh | sudo bash -
+# directly via pipe
+wget -4 -qO- https://raw.githubusercontent.com/heinz-otto/scripts/master/Bash/install-wireguard-reresolve-dns.sh | sudo bash -
+# download first and execute
 wget -4 -qO install-wireguard-reresolve-dns.sh https://raw.githubusercontent.com/heinz-otto/scripts/master/Bash/install-wireguard-reresolve-dns.sh
 bash install-wireguard-reresolve-dns.sh
 ```
