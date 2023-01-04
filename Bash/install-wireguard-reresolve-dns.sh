@@ -34,7 +34,7 @@ for interface in $(wg show interfaces); do
         # '< /dev/tty' to read directly from the terminal not from /dev/stdin wich is the pipe
         read -p "Die conf hat einen DNS Eintrag - entfernen? " yn < /dev/tty 
         case $yn in
-             [Yy]* ) sed /"$r"/d "$f" > $n; mv $f ${interface}.sav ; mv $n $f ; break;; # hier muss noch ein reload hin? wg syncconf wg0 <(wg-quick strip wg0)
+             [Yy]* ) sed /"$r"/d "$f" > $n; mv $f ${interface}.sav; mv $n $f; resolvconf -d wg0; break;; # delete the old DNS entry in resolvconf without restart wg0
              [Nn]* ) break;;
              * ) echo "Please answer yes or no.";;
         esac
