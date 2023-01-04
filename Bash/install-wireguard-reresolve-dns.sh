@@ -31,7 +31,8 @@ for interface in $(wg show interfaces); do
    n="/etc/wireguard/${interface}.new"
    if grep "$r" "$f" ; then
       while true; do
-        read -p "Die conf hat einen DNS Eintrag - entfernen? " yn
+        # '< /dev/tty' to read directly from the terminal not from /dev/stdin wich is the pipe
+        read -p "Die conf hat einen DNS Eintrag - entfernen? " yn < /dev/tty 
         case $yn in
              [Yy]* ) sed /"$r"/d "$f" > $n; mv $f ${interface}.sav ; mv $n $f ; break;; # hier muss noch ein reload hin? wg syncconf wg0 <(wg-quick strip wg0)
              [Nn]* ) break;;
