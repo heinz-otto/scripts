@@ -3,8 +3,10 @@
 # This script installs a systemd timer template named WireguardReResolveDNS.(service|timer)
 # to run every 30 seconds. Requires that wireguard-tools is installed.
 # This script will enable the timer service for every wg interface
+# finally it will patch the systemd service to LogLevel=notice because the timer will log every time 3 messages
 
 export NAME=wg-reresolve-dns@
+# create service and timer units
 cat >/etc/systemd/system/${NAME}.service <<EOF
 [Unit]
 Description=${NAME}
@@ -24,8 +26,10 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
+# remove DNS =  entry from all interfaces to prevent deadlock for resolving names
+# remove active DNS entry from resolvconf without restart
+# finally enable the timer
 r='^DNS = 192'
-
 for interface in $(wg show interfaces); do
    f="/etc/wireguard/${interface}.conf"
    n="/etc/wireguard/${interface}.new"
@@ -42,3 +46,7 @@ for interface in $(wg show interfaces); do
       systemctl enable --now wg-reresolve-dns@${interface}.timer
    fi
 done
+
+# modify systemd LogLevel from Standard 'info' to 'notice' 
+sed -i 's/^#LogLevel=.*/LogLevel=notice/' /etc/systemd/system.conf
+systemctl daemon-reexec
