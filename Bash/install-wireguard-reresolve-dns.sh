@@ -3,7 +3,13 @@
 # This script installs a systemd timer template named WireguardReResolveDNS.(service|timer)
 # to run every 30 seconds. Requires that wireguard-tools is installed.
 # This script will enable the timer service for every wg interface
-# finally it will patch the systemd service to LogLevel=notice because the timer will log every time 3 messages
+# finally it will patch the systemd service to LogLevel=notice because the timer will log extensivly 3 messages per time
+
+# run this Script as root https://www.linuxjournal.com/content/automatically-re-start-script-root-0
+if [[ $UID -ne 0 ]]; then
+   sudo -p 'Restarting as root, password: ' bash $0 "$@"
+   exit $?
+fi
 
 export NAME=wg-reresolve-dns@
 # create service and timer units
@@ -36,7 +42,7 @@ for interface in $(wg show interfaces); do
    if grep "$r" "$f" ; then
       while true; do
         # '< /dev/tty' to read directly from the terminal not from /dev/stdin wich is the pipe
-        read -p "Die conf hat einen DNS Eintrag - entfernen? " yn < /dev/tty 
+        read -p "Die conf hat einen DNS Eintrag - entfernen? y/n " yn < /dev/tty 
         case $yn in
              [Yy]* ) sed /"$r"/d "$f" > $n; mv $f ${interface}.sav; mv $n $f; resolvconf -d wg0; break;; # delete the old DNS entry in resolvconf without restart wg0
              [Nn]* ) break;;
