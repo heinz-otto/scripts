@@ -13,4 +13,7 @@ if ! ls ~/.ssh/id_${key_version}.pub >/dev/null; then
   else
     echo "public key of type ${key_version} already in place"
 fi
-cat ~/.ssh/id_${key_version}.pub
+#cat ~/.ssh/id_${key_version}.pub
+echo "copy the following line and execute them at the destination host"
+echo "make sure you are in the home directory and the .ssh directory exist"
+echo "echo $(cat ~/.ssh/id_${key_version}.pub) >>.ssh/authorized_keys"
