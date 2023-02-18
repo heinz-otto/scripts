@@ -15,5 +15,6 @@ if ! ls ~/.ssh/id_${key_version}.pub >/dev/null; then
 fi
 #cat ~/.ssh/id_${key_version}.pub
 echo "copy the following line and execute them at the destination host"
+echo "works on linux or windows cmd - but NOT in Powershell"
 echo "make sure you are in the home directory and the .ssh directory exist"
 echo "echo $(cat ~/.ssh/id_${key_version}.pub) >>.ssh/authorized_keys"
