@@ -13,7 +13,8 @@ fi
 
 WG_GWIP=$1
 WG_IF=${2:-"wg0"}
-date
+#date 
+echo $(date) CPU $(/usr/bin/vcgencmd measure_temp | cut -f2 -d=)
 if ! /bin/ping -c 1 $WG_GWIP
 then
   /usr/bin/systemctl restart wg-quick@${WG_IF}
