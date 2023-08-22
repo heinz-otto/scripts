@@ -15,7 +15,7 @@ WG_GWIP=$1
 WG_IF=${2:-"wg0"}
 #date 
 echo $(date) CPU $(/usr/bin/vcgencmd measure_temp | cut -f2 -d=)
-if ! /bin/ping -c 1 $WG_GWIP
+if ! /bin/ping -c 1 $WG_GWIP | sed '/PING/!d;N;s/\n/, /'
 then
   /usr/bin/systemctl restart wg-quick@${WG_IF}
   echo "restart interface $WG_IF"
