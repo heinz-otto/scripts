@@ -13,12 +13,10 @@ fi
 
 WG_GWIP=$1
 WG_IF=${2:-"wg0"}
-#date 
-echo $(date) CPU $(/usr/bin/vcgencmd measure_temp | cut -f2 -d=)
-#| sed '/PING/!d;N;s/\n/, /'
-if ! /bin/ping -c 1 $WG_GWIP 
+echo $(date) $(/usr/bin/vcgencmd measure_temp 2>/dev/null )
+if ! /bin/ping -c 1 $WG_GWIP 2>&1 >/dev/null
 then
+  echo "Error - restart Interface $WG_IF"
   /usr/bin/systemctl restart wg-quick@${WG_IF}
-  echo "restart interface $WG_IF"
-  else echo "Interface $WG_IF with IP $WG_GWIP is reachable"
+  else echo "IP $WG_GWIP is reachable over Interface $WG_IF"
 fi
