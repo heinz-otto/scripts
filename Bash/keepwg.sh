@@ -2,8 +2,9 @@
 # this script will ping the server side tunnel interface and restart the local interface if failes. 
 # wget -4 -O keepwg.sh https://raw.githubusercontent.com/heinz-otto/scripts/master/Bash/keepwg.sh
 # chmod +x keepwg.sh
+# sudo cp keepwg.sh /usr/local/bin/
 # entry in crontab: sudo crontab -e
-#*/5 * * * * /home/otto/keepwg.sh 10.6.0.1 >> /home/otto/keepwg.log 2>&1
+# */5 * * * * /usr/local/bin/keepwg.sh 10.6.0.1 >> /var/log/keepwg.log 2>&1
 if [ -z "$1" ]; then
   echo "usage:"
   echo "${0##*/} <Tunnel IP Server> [wireguard interface name]"
