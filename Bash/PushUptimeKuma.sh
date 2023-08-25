@@ -21,6 +21,5 @@ zeit=$(timeout 0.2 ping -c $count $ip|awk -F'[/]' '/^rtt/{print $5}')
 if [ -z "$zeit" ] ; then
   echo "host not reachable"
 else
-  echo "${url}${zeit}"
-  # wget -q "${url}${zeit}"
+  wget -q "${url}${zeit}" 2>&1 >/dev/null
 fi
