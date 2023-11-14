@@ -4,6 +4,7 @@
 # to run every 30 seconds. Requires that wireguard-tools is installed.
 # This script will enable the timer service for every wg interface
 # finally it will patch the systemd service to LogLevel=notice because the timer will log extensivly 3 messages per time
+# you could check if timer is installed and running: systemctl list-timers 
 
 # run this Script as root https://www.linuxjournal.com/content/automatically-re-start-script-root-0
 if [[ $UID -ne 0 ]]; then
