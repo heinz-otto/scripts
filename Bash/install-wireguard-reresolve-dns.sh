@@ -49,8 +49,8 @@ for interface in $(wg show interfaces); do
              * ) echo "Please answer yes or no.";;
         esac
       done
-      systemctl enable --now wg-reresolve-dns@${interface}.timer
    fi
+   systemctl enable --now wg-reresolve-dns@${interface}.timer
 done
 
 # modify systemd LogLevel from Standard 'info' to 'notice' 
