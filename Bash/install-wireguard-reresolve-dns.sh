@@ -12,6 +12,11 @@ if [[ $UID -ne 0 ]]; then
    exit $?
 fi
 
+# check if wireguard-tools installed and install on demand
+if ! apt list wireguard-tools; then
+   apt install wireguard-tools
+fi
+
 export NAME=wg-reresolve-dns@
 # create service and timer units
 cat >/etc/systemd/system/${NAME}.service <<EOF
