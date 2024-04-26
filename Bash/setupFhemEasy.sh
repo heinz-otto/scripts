@@ -22,7 +22,7 @@ else
   fi
   if [ $key = 'ok' ] ;then
     apt-get update
-    apt-get install fhem
+    apt-get install fhem -y
   else
     echo Es gab ein Problem mit dem debian.fhem.de/archive.key
     exit 1
