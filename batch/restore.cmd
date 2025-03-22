@@ -1,6 +1,6 @@
 @echo off & setlocal
 REM Diese Script stellt eine Windows System Disk komplett mit Neupartitionierung und Image wieder her
-REM image auswaehlen
+REM Es gibt 3 mögliche Übergabe Parameter die sind vorbelegt: backup UEFI 1
 set image=backup.wim
 if not "%1"=="" set image=%1.wim
 REM Setze das Partitionsschema BIOS oder UEFI
