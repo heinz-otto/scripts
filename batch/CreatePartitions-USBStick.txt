@@ -6,6 +6,7 @@ rem    Important: set the correct disk!!!
 rem select disk 3
 clean
 rem == 1. Boot partition ======================
+rem for Windows Setup size 4096, ab Win 10 6144 8192
 create partition primary size=512
 format quick fs=fat32 label="BOOT"
 active
