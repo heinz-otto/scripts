@@ -5,6 +5,7 @@ rem    for a BIOS/MBR-based computer.
 rem    Important: set the correct disk!!!
 rem select disk 3
 clean
+convert mbr
 rem == 1. Boot partition ======================
 rem for Windows Setup size 4096, ab Win 10 6144 8192
 create partition primary size=512
