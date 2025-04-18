@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# this fills in the default arguments for creating a new
+# certificate. all the caller needs to provide is the "-d"
+# argument with a comma separated list of names to put on
+# the certificate.
+exec certbot certonly \
+    --http-01-port 54321 --standalone --preferred-challenges http \
+    --post-hook /usr/local/bin/letsencrypt-reload-hook \
+    "$@"
