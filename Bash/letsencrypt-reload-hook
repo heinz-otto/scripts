@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+PATH_TO_LIVE=/etc/letsencrypt/live
+PATH_TO_TARGET=/usr/local/ssl/certs
+RENEWED_LINEAGE=`ls $PATH_TO_LIVE/`
+
+# make sure we have a place for the certs
+mkdir -p $PATH_TO_TARGET
+mkdir -p $PATH_TO_TARGET/sites
+
+# for each domain create a concatenated pem file
+for DOMAIN in $RENEWED_LINEAGE; do
+    if [ -d "$PATH_TO_LIVE/$DOMAIN" ]; then
+        echo "assembling certificate $DOMAIN for sites"
+        cat "$PATH_TO_LIVE/$DOMAIN/privkey.pem" \
+          "$PATH_TO_LIVE/$DOMAIN/fullchain.pem" > "$PATH_TO_TARGET/sites/$DOMAIN.pem"
+        chmod 400 "$PATH_TO_TARGET/sites/$DOMAIN.pem"
+    fi
+done
+
+if [ -e /etc/systemd/system/multi-user.target.wants/haproxy.service ]; then
+    systemctl reload haproxy
+fi
