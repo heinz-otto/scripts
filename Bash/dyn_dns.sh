@@ -10,7 +10,7 @@
 ip_current=$(cat ip_current)
 ip=$(dig @resolver4.opendns.com myip.opendns.com +short)
 if [ "$ip" != "$ip_current" ]; then
-    echo 'reregister ddns'
+    echo 'reregister ddns for sub.domain.tld'
     curl -su dynUser:password https://dyndns.kasserver.com
     echo $ip>ip_current
   else
